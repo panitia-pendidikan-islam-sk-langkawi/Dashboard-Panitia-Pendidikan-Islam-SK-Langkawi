@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panitia Pendidikan Islam SK Langkawi 2027</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:light;--color-fg:#1b1b2f;--color-bg:#fff;--color-panel:#f4f5fb;--color-border-line:#dfe2ee;--color-fg-muted:#5f647a;--color-ok:#00a844;--color-bad:#e0002b;--cds-surface-popover:#fff;--cds-border:#ccd;--cds-shadow-popover:0 4px 14px rgba(0,0,0,.15);--cds-text-secondary:#3a3f55;--cds-chart-axis:#9aa0b5;--cds-chart-grid:#e3e6f0;--font-anthropic-sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--font-anthropic-serif:Georgia,serif}
+*{box-sizing:border-box}
+body{margin:0;background:#eef0fa;padding:12px}
+.dash-select{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--color-border-line);border-radius:10px;background:var(--color-bg);color:var(--color-fg)}
+.pp{container-type:inline-size;font-family:var(--font-anthropic-sans);color:var(--color-fg)}
+.pp-wrap{display:grid;grid-template-columns:210px minmax(0,1fr);gap:16px;max-width:1280px;margin:0 auto}
+.pp-side{background:linear-gradient(170deg,#1a0b5e,#2f1fa8 55%,#5b3ff0);border-radius:18px;padding:16px 12px;display:flex;flex-direction:column;gap:6px;color:#fff;align-self:start;position:sticky;top:8px}
+.pp-logo{display:flex;align-items:center;gap:10px;padding:4px 6px 12px}
+.pp-logo svg{flex:none}
+.pp-logo b{font-size:15px;line-height:1.2}
+.pp-logo span{display:block;font-size:11px;opacity:.75;font-weight:400}
+.pp-logo circle{fill:#fff}.pp-logo path,.pp-logo polygon{fill:#2f1fa8}
+.pp-nav{display:flex;align-items:center;gap:10px;background:none;border:0;color:#e8f5f1;font:inherit;font-size:14px;padding:10px 12px;border-radius:12px;cursor:pointer;text-align:left;white-space:nowrap}
+.pp-nav:hover{background:rgba(255,255,255,.1)}
+.pp-nav.on{background:linear-gradient(90deg,#ff4fd8,#ff7a59);color:#fff;font-weight:600}
+.pp-nav i{font-style:normal;width:20px;text-align:center}
+.pp-foot{margin-top:auto;padding:14px 8px 4px;font-size:11px;opacity:.7;line-height:1.5}
+.pp-main{min-width:0}
+.pp-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.pp-search{flex:1;min-width:180px;display:flex;align-items:center;gap:8px;background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:999px;padding:8px 14px}
+.pp-search input{flex:1;min-width:0;border:0;background:none;color:var(--color-fg);font:inherit;outline:none}
+.pp-chip{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:999px;padding:7px 14px;font-size:13px;white-space:nowrap}
+.pp-hero{position:relative;overflow:hidden;border-radius:20px;padding:26px 28px;color:#fff;background:linear-gradient(120deg,#2f1fa8 0%,#0061ff 48%,#d500a8 100%);display:flex;gap:16px;align-items:center;margin-bottom:14px;min-height:170px}
+.pp-hero-t{position:relative;z-index:1;flex:1;min-width:0}
+.pp-kicker{font-family:var(--font-anthropic-serif);font-style:italic;font-size:18px;color:#fff}
+.pp-hero h1{margin:2px 0 4px;font-family:var(--font-anthropic-serif);font-weight:400;font-size:clamp(24px,4.2cqw,38px);line-height:1.1}
+.pp-hsub{margin:0 0 8px;font-weight:600;color:#fff}
+.pp-lead{margin:0 0 12px;opacity:.92;font-size:14px}
+.pp-lead b{font-variant-numeric:tabular-nums}
+.pp-chips{display:flex;gap:8px;flex-wrap:wrap}
+.pp-chips span{background:rgba(255,255,255,.16);border-radius:999px;padding:5px 12px;font-size:12px}
+.pp-art{position:absolute;right:-10px;top:0;height:100%;width:300px;opacity:.95;pointer-events:none}
+.pp-art g:first-child{fill:#fff}
+.pp h2{font-size:18px;font-weight:600;margin:0 0 4px}
+.pp h3{font-size:14px;font-weight:600;margin:0 0 6px}
+.pp-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.pp-kpi{background:var(--color-bg);border:1px solid var(--color-border-line);border-left:6px solid var(--k,#6200ea);border-radius:16px;padding:12px;display:flex;gap:10px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.pp-ic{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:21px;color:#fff}
+.pp-kv{display:flex;flex-direction:column;min-width:0}
+.pp-val{font-size:26px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--k)}
+.pp-lab{font-size:12px;color:var(--color-fg-muted)}
+.pp-sub{font-size:11px;color:var(--color-fg-muted)}
+.pp-kpi:nth-child(1){--k:#7c4dff}.pp-kpi:nth-child(2){--k:#0066ff}.pp-kpi:nth-child(3){--k:#00c853}.pp-kpi:nth-child(4){--k:#ff9100}.pp-kpi:nth-child(5){--k:#00bfa5}.pp-kpi:nth-child(6){--k:#ff6d00}
+.pp-card{background:var(--color-bg);border:1px solid var(--color-border-line);border-radius:16px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.05);min-width:0;margin-bottom:14px}
+.pp-grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:14px}
+.pp-grid3 .pp-card{margin-bottom:0}
+.pp-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.pp-grid2 .pp-card{margin-bottom:0}
+.pp-split{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;margin-bottom:14px}
+.pp-split>.pp-card{margin-bottom:0}
+.pp-pcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.pp-pc{border:2px solid var(--color-border-line);border-radius:14px;overflow:hidden;cursor:pointer;background:var(--color-bg);display:flex;flex-direction:column}
+.pp-pc.sel{border-color:#ff4fd8;box-shadow:0 0 0 3px rgba(255,79,216,.25)}
+.pp-band{height:62px;position:relative;display:flex;align-items:flex-end;justify-content:space-between;padding:6px 8px;color:#fff;font-size:11px}
+.pp-band em{font-style:normal;position:absolute;right:10px;top:4px;font-size:30px;opacity:.9}
+.pp-date{background:var(--color-bg);color:var(--color-fg);border-radius:8px;padding:2px 8px;font-weight:700;font-size:12px}
+.pp-pcb{padding:8px 10px 10px;display:flex;flex-direction:column;gap:5px;flex:1}
+.pp-pcb b{font-size:13px;line-height:1.25}
+.pp-pcb small{color:var(--color-fg-muted);font-size:11px}
+.pp-det .dl{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;font-size:13px;margin:10px 0}
+.pp-det .dl span{color:var(--color-fg-muted)}
+.pp-pill{display:inline-block;color:#fff;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:600}
+.pp-note{font-size:12px;color:var(--color-fg-muted);margin:4px 0 10px}
+.pp-chart{position:relative;min-height:60px}
+.pp-tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);box-shadow:var(--cds-shadow-popover);color:var(--cds-text-secondary);font-size:12px;padding:4px 8px;border-radius:6px;max-width:260px;z-index:5}
+.pp-chart svg text{font-size:12px;fill:var(--cds-text-secondary)}
+.pp-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--color-fg-muted);margin-top:6px}
+.pp-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+.pp-donut{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.pp-donut ul{list-style:none;margin:0;padding:0;font-size:13px;display:flex;flex-direction:column;gap:6px}
+.pp-scroll{overflow-x:auto}
+.pp-table{width:100%;border-collapse:collapse;font-size:13px}
+.pp-table th{text-align:left;font-size:12px;font-weight:600;color:var(--color-fg-muted);padding:6px 8px;border-bottom:1px solid var(--color-border-line);white-space:nowrap}
+.pp-table td{padding:7px 8px;border-bottom:1px solid var(--color-border-line);vertical-align:top;font-variant-numeric:tabular-nums}
+.pp-table tr.pick{cursor:pointer}
+.pp-table tr.pick:hover td{background:var(--color-panel)}
+.pp-table tr.tot td{font-weight:600}
+.pp .good{color:#00a844;font-weight:600}.pp .poor{color:#e0002b;font-weight:600}
+.pp-st{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.pp-st:before{content:'';width:8px;height:8px;border-radius:50%;background:var(--c)}
+.pp-prog{display:flex;align-items:center;gap:6px;min-width:90px}
+.pp-prog em{flex:1;max-width:80px;height:6px;border-radius:3px;background:var(--color-border-line);display:block;overflow:hidden}
+.pp-prog i{display:block;height:6px;border-radius:3px;background:#0066ff}
+.pp-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.pp-btn{font:inherit;font-size:13px;padding:7px 14px;border-radius:10px;border:1px solid var(--color-border-line);background:var(--color-bg);color:var(--color-fg);cursor:pointer}
+.pp-btn.pri{background:#6200ea;color:#fff;border-color:#6200ea}
+.pp-btn.bad{border-color:var(--color-bad);color:var(--color-bad)}
+.pp-ed{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:14px;padding:14px;margin-top:12px}
+.pp-ed .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.pp-ed label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--color-fg-muted)}
+.pp-ed input,.pp-ed select{font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--color-border-line);border-radius:8px;background:var(--color-bg);color:var(--color-fg);min-width:0}
+.pp-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pp-msg{color:var(--color-bad);font-size:12px;margin:6px 0 0}
+.pp-cell{display:inline-block;min-width:30px;text-align:center;border-radius:8px;padding:2px 8px;font-weight:700;font-size:12px}
+.pp-table th[data-field=tp1],.pp-table th[data-field=tp5],.pp-table th[data-field=tp6],.pp-table th[data-field=a],.pp-table th[data-field=e]{color:#fff}
+.pp-table th[data-field=tp1]{background:#ff1744}.pp-table th[data-field=tp2]{background:#ff9100;color:#222}.pp-table th[data-field=tp3]{background:#b3d4ff;color:#222}.pp-table th[data-field=tp4]{background:#66a6ff;color:#222}.pp-table th[data-field=tp5]{background:#1a73ff}.pp-table th[data-field=tp6]{background:#0b3bd1}
+.pp-table th[data-field=a]{background:#00b8d4}.pp-table th[data-field=b]{background:#2979ff;color:#fff}.pp-table th[data-field=c]{background:#ffab00;color:#222}.pp-table th[data-field=d]{background:#ff6d00;color:#fff}.pp-table th[data-field=e]{background:#f50057}.pp-table th[data-field=th]{background:#78909c;color:#fff}
+.pp-table th[data-field=bawah]{background:#ffe0e6;color:#b0002b}.pp-table th[data-field=pct],.pp-table th[data-field=lulus]{background:#ffe0f4;color:#b0006e}.pp-table th[data-field=gpmp]{background:#ece3ff;color:#4a1fb8}
+.pp-table th[data-field=tp1],.pp-table th[data-field=tp2],.pp-table th[data-field=tp3],.pp-table th[data-field=tp4],.pp-table th[data-field=tp5],.pp-table th[data-field=tp6],.pp-table th[data-field=a],.pp-table th[data-field=b],.pp-table th[data-field=c],.pp-table th[data-field=d],.pp-table th[data-field=e],.pp-table th[data-field=th],.pp-table th[data-field=bawah],.pp-table th[data-field=lulus],.pp-table th[data-field=gpmp]{text-align:center}
+.pp-lock{border-radius:999px}
+@container (max-width:860px){.pp-wrap{grid-template-columns:1fr}.pp-side{position:static;flex-direction:row;overflow-x:auto;padding:8px;border-radius:14px}.pp-logo,.pp-foot{display:none}.pp-split{grid-template-columns:1fr}.pp-art{opacity:.35}.pp-hero{padding:18px}}
+[data-sec]+[data-sec]{margin-top:18px}
+@media print{.pp [data-sec][hidden]{display:block!important}.pp-side,.pp-top,.pp-ed,.pp-bar{display:none!important}.pp-wrap{display:block}.pp [data-sec]+[data-sec]{break-before:page}}
+</style>
+</head>
+<body>
+<div class='pp'><div class='pp-wrap'>
+<aside class='pp-side' role='tablist'>
+<div class='pp-logo'><svg width='38' height='38' viewBox='0 0 40 40' aria-hidden='true'><circle cx='20' cy='20' r='19'/><path d='M24 9a11 11 0 1 0 6 18a9 9 0 1 1 -6 -18z'/><polygon points='29,10 30.2,13 33,13.5 30.8,15.5 31.4,18.5 29,17 26.6,18.5 27.2,15.5 25,13.5 27.8,13'/></svg><b>Panitia PI<span>SK Langkawi</span></b></div>
+<button class='pp-nav on' type='button' role='tab' data-tab='utama'><i>🏠</i>Papan Utama</button>
+<button class='pp-nav' type='button' role='tab' data-tab='program'><i>📅</i>Program 2027</button>
+<button class='pp-nav' type='button' role='tab' data-tab='prestasi'><i>📊</i>Prestasi 2026</button>
+<button class='pp-nav' type='button' role='tab' data-tab='intervensi'><i>🎯</i>Intervensi</button>
+<button class='pp-nav' type='button' role='tab' data-tab='guru'><i>👩‍🏫</i>Guru dan RPT</button>
+<button class='pp-nav' type='button' role='tab' data-tab='kewangan'><i>💰</i>Kewangan</button>
+<div class='pp-foot'>Bersama membina generasi Qurani.<br>Data asas: minit mesyuarat panitia 2026.</div>
+</aside>
+<main class='pp-main'>
+<header class='pp-top'>
+<label class='pp-search'><span aria-hidden='true'>🔎</span><input id='q' type='search' placeholder='Cari program, guru atau kata kunci…' aria-label='Cari program'></label>
+<span class='pp-chip' data-draw='countdown'>—</span>
+<span class='pp-chip' id='sambung'>Menyambung…</span>
+<button class='pp-btn pp-lock' type='button' id='penuh'>📄 Paparan penuh</button>
+<button class='pp-btn pp-lock' type='button' id='kunci'>🔒 Kod edit</button>
+<button class='pp-btn pp-lock' type='button' id='tukar' hidden>Tukar kod</button>
+<button class='pp-btn pri' type='button' id='add-programs'>+ Program baharu</button>
+</header>
+
+<section id='t-utama' data-sec>
+<div class='pp-hero'>
+<div class='pp-hero-t'>
+<span class='pp-kicker'>Selamat datang ke</span>
+<h1 id='judul'>Panitia Pendidikan Islam Sekolah Kebangsaan Langkawi 2027</h1>
+<p class='pp-hsub'>Papan pemantauan program dan prestasi</p>
+<p class='pp-lead'><b data-draw='k_jumlah'>—</b> program dirancang, <b data-draw='k_selesai'>—</b> selesai, kemajuan purata <b data-draw='k_purata'>—</b>%.</p>
+<div class='pp-chips'><span>Al-Quran</span><span>Jawi</span><span>Solat</span><span>Intervensi</span><span>PBD dan UASA</span></div>
+</div>
+<svg class='pp-art' viewBox='0 0 300 170' aria-hidden='true'><g><path d='M210 18a44 44 0 1 0 30 70a36 36 0 1 1 -30 -70z'/><polygon points='248,24 251,32 259,33 253,38 255,46 248,42 241,46 243,38 237,33 245,32'/><polygon points='170,50 172,55 177,56 173,59 174,64 170,61 166,64 167,59 163,56 168,55'/><polygon points='280,100 282,105 287,106 283,109 284,114 280,111 276,114 277,109 273,106 278,105'/></g><g opacity='.9'><path d='M150 150 q40 -22 75 0 v-48 q-35 -22 -75 0z' fill='#ffffff' opacity='.85'/><path d='M225 150 q40 -22 75 0 v-48 q-35 -22 -75 0z' fill='#dfeee9' opacity='.85'/></g><g stroke='#ffffff' stroke-opacity='.25' fill='none'><circle cx='60' cy='140' r='40'/><circle cx='60' cy='140' r='26'/><rect x='34' y='114' width='52' height='52' transform='rotate(45 60 140)'/></g></svg>
+</div>
+<div class='pp-card'><h2>Kemajuan keseluruhan panitia 2027</h2><div class='pp-chart' data-draw='overall'>—</div></div>
+<div class='pp-cards'>
+<div class='pp-kpi'><div class='pp-ic' style='background:linear-gradient(135deg,#b388ff,#651fff)'>📅</div><div class='pp-kv'><b class='pp-val' data-draw='k_jumlah'>—</b><span class='pp-lab'>Jumlah program 2027</span></div></div>
+<div class='pp-kpi'><div class='pp-ic' style='background:linear-gradient(135deg,#40a4ff,#0044cc)'>🔄</div><div class='pp-kv'><b class='pp-val' data-draw='k_berjalan'>—</b><span class='pp-lab'>Sedang berjalan</span></div></div>
+<div class='pp-kpi'><div class='pp-ic' style='background:linear-gradient(135deg,#69f0ae,#00a844)'>✅</div><div class='pp-kv'><b class='pp-val' data-draw='k_selesai'>—</b><span class='pp-lab'>Selesai</span></div></div>
+<div class='pp-kpi'><div class='pp-ic' style='background:linear-gradient(135deg,#ffd740,#ff6d00)'>⏳</div><div class='pp-kv'><b class='pp-val' data-draw='k_belum'>—</b><span class='pp-lab'>Belum mula</span><span class='pp-sub'><b data-draw='k_tertunda'>—</b> tertunda</span></div></div>
+<div class='pp-kpi'><div class='pp-ic' style='background:linear-gradient(135deg,#64ffda,#00897b)'>📚</div><div class='pp-kv'><span class='pp-val'><b data-draw='k_pbdPct'>—</b>%</span><span class='pp-lab'>PBD 2026: TP3 ke atas</span><span class='pp-sub'><b data-draw='k_pbdBawah'>—</b> murid di bawah TP3</span></div></div>
+<div class='pp-kpi'><div class='pp-ic' style='background:linear-gradient(135deg,#ffab40,#e65100)'>📝</div><div class='pp-kv'><span class='pp-val'><b data-draw='k_rptPct'>—</b>%</span><span class='pp-lab'>Pelaksanaan RPT 2027</span></div></div>
+</div>
+<div class='pp-grid3'>
+<div class='pp-card'><h3>Program aktif mengikut bulan</h3><div class='pp-chart' data-draw='trendchart'>—</div></div>
+<div class='pp-card'><h3>Status program</h3><div class='pp-chart' data-draw='statusdonut'>—</div></div>
+<div class='pp-card'><h3>PBD 2026: TP3 ke atas (%)</h3><div class='pp-chart' data-draw='pbdbar'>—</div></div>
+</div>
+<div class='pp-split'>
+<div class='pp-card'><h2>Program terkini dan akan datang</h2><p class='pp-note'>Klik kad untuk melihat butiran. Sebelum Januari 2027, senarai bermula dari program awal tahun.</p><div class='pp-pcs' data-draw='cards'></div></div>
+<div class='pp-card pp-det'><h2>Maklumat program</h2><div data-draw='detail'></div><div class='pp-row'><button class='pp-btn pri' type='button' id='det-edit'>Edit</button><button class='pp-btn' type='button' id='det-done'>Tandakan selesai</button></div><p class='pp-msg' id='det-msg' hidden>Tidak disimpan. Kod edit salah atau tiada sambungan.</p></div>
+</div>
+<div class='pp-card'>
+<h2>Petunjuk prestasi 2027 berbanding 2026</h2>
+<p class='pp-note'>Asas ialah data akhir 2026 daripada minit. Isi nilai semasa selepas setiap headcount, PBD atau peperiksaan, dan tetapkan sasaran panitia. Klik satu baris untuk mengemas kini.</p>
+<div class='pp-bar'><button class='pp-btn pri' type='button' id='add-pet'>+ Tambah petunjuk</button></div>
+<div class='pp-scroll'><table class='pp-table'><thead><tr><th>Petunjuk</th><th>Unit</th><th>Asas 2026</th><th>Semasa 2027</th><th>Sasaran</th><th>Perubahan</th><th>Sasaran</th><th>Catatan</th></tr></thead><tbody data-draw='tb_pet'></tbody></table></div>
+<form class='pp-ed' id='ed-pet' hidden>
+<h3>Butiran petunjuk</h3>
+<div class='g'>
+<label>No.<input name='no' type='number' min='0'></label>
+<label>Petunjuk<input name='nama' required></label>
+<label>Unit<select name='unit'><option value='%'>%</option><option value='bil'>bil</option><option value='gred'>gred</option></select></label>
+<label>Arah baik<select name='arah'><option value='tinggi'>Lebih tinggi lebih baik</option><option value='rendah'>Lebih rendah lebih baik</option></select></label>
+<label>Asas 2026<input name='asas' type='number' step='0.01'></label>
+<label>Semasa 2027<input name='semasa' type='number' step='0.01'></label>
+<label>Sasaran<input name='sasaran' type='number' step='0.01'></label>
+<label>Catatan<input name='catatan'></label>
+</div>
+<div class='pp-row'><button type='submit' class='pp-btn pri'>Simpan</button><button type='button' class='pp-btn' data-act='close'>Tutup</button><button type='button' class='pp-btn bad' data-act='del' hidden>Padam</button><button type='button' class='pp-btn bad' data-act='del2' hidden>Sahkan padam</button></div>
+<p class='pp-msg' hidden>Tidak disimpan. Kod edit salah atau tiada sambungan.</p>
+</form>
+</div>
+</section>
+
+<section id='t-program' data-sec hidden>
+<div class='pp-grid2' style='margin-bottom:14px'>
+<div class='pp-card'><h2>Peratus program sudah berjalan</h2><p class='pp-note'>Sudah berjalan = sedang berjalan + selesai.</p><div class='pp-chart' data-draw='progdonut'>—</div></div>
+<div class='pp-card'><h2>Kemajuan mengikut kategori</h2><p class='pp-note'>Bar = kemajuan purata (%); angka kedua = bilangan program.</p><div class='pp-chart' data-draw='catbars'>—</div></div>
+<div class='pp-card'><h2>Beban tugas Penyelaras</h2><p class='pp-note'>Bilangan program dan intervensi yang diselaraskan setiap guru.</p><div class='pp-chart' data-draw='bebanchart'>—</div></div>
+</div>
+<div class='pp-card'>
+<h2>Program 2027</h2>
+<p class='pp-note'>Senarai penuh program panitia 2027 (termasuk mesyuarat, PLC dan tugas pentadbiran), disusun daripada ketiga-tiga minit 2026. Setiap program ada seorang Penyelaras. Bulan dan tarikh ialah cadangan, sila sahkan dengan takwim 2027. Klik satu baris untuk mengemas kini kemajuan.</p>
+<div class='pp-bar'><select class='dash-select' id='f-status' aria-label='Tapis status'><option value=''>Semua status</option><option>Belum mula</option><option>Sedang berjalan</option><option>Selesai</option><option>Tertunda</option></select><select class='dash-select' id='f-kat' aria-label='Tapis kategori'><option value=''>Semua kategori</option><option>Sepanjang tahun</option><option>Peningkatan murid</option><option>Perayaan</option><option>Pentadbiran</option><option>Pertandingan</option><option>Mesyuarat</option><option>Pembangunan Guru (PLC)</option></select></div>
+<div class='pp-scroll'><table class='pp-table'><thead><tr><th>Program</th><th>Kategori</th><th>Tempoh</th><th>Tarikh cadangan</th><th>Penyelaras</th><th>Status</th><th>Kemajuan (%)</th><th>Catatan</th></tr></thead><tbody data-draw='tb_programs'></tbody></table></div>
+<form class='pp-ed' id='ed-programs' hidden>
+<h3>Butiran program</h3>
+<div class='g'>
+<label>Nama program<input name='nama' required></label>
+<label>Kategori<select name='kategori'><option>Sepanjang tahun</option><option>Peningkatan murid</option><option>Perayaan</option><option>Pentadbiran</option><option>Pertandingan</option><option>Mesyuarat</option><option>Pembangunan Guru (PLC)</option></select></label>
+<label>Tarikh cadangan<input name='tarikh' type='date'></label>
+<label>Bulan mula (1–12)<input name='mula' type='number' min='1' max='12'></label>
+<label>Bulan tamat (1–12)<input name='tamat' type='number' min='1' max='12'></label>
+<label>Penyelaras<input name='pic' list='dl-guru'><datalist id='dl-guru'><option value='Zarila'><option value='Nor Azhanah'><option value='Zulkifli'><option value='Siti Nabilah'><option value='Azlina Faziera'><option value='Azima'><option value='Muhammad Adib'><option value='A’in Nazirah'></datalist></label>
+<label>Status<select name='status'><option>Belum mula</option><option>Sedang berjalan</option><option>Selesai</option><option>Tertunda</option></select></label>
+<label>Kemajuan (%)<input name='peratus' type='number' min='0' max='100'></label>
+<label>Catatan<input name='catatan'></label>
+</div>
+<div class='pp-row'><button type='submit' class='pp-btn pri'>Simpan</button><button type='button' class='pp-btn' data-act='done'>Tandakan selesai</button><button type='button' class='pp-btn' data-act='close'>Tutup</button><button type='button' class='pp-btn bad' data-act='del' hidden>Padam</button><button type='button' class='pp-btn bad' data-act='del2' hidden>Sahkan padam</button></div>
+<p class='pp-msg' hidden>Tidak disimpan. Kod edit salah atau tiada sambungan.</p>
+</form>
+</div>
+<div class='pp-card'><h2>Jadual program sepanjang 2027</h2><div class='pp-chart' data-draw='gantt'>—</div><p class='pp-note'>Bar penuh ialah kemajuan, bar pudar ialah tempoh dirancang.</p></div>
+</section>
+
+<section id='t-prestasi' data-sec hidden>
+<div class='pp-card'>
+<h2>PBD akhir tahun 2026</h2>
+<p><b data-draw='k_pbdPct'>—</b>% daripada <b data-draw='k_pbdMurid'>—</b> murid mencapai TP3 ke atas. <b data-draw='k_pbdBawah'>—</b> murid masih TP1–TP2, paling ramai di Tahun <b data-draw='k_worstTahun'>—</b> (<b data-draw='k_worstN'>—</b> murid). Penguasaan paling rendah: Tahun <b data-draw='k_lowTahun'>—</b> (<b data-draw='k_lowPct'>—</b>%). Murid TP1–TP2 tertumpu di kelas Arif Tahun 1 dan Arif Tahun 4.</p>
+<div class='pp-chart' data-draw='pbdchart'>—</div>
+<div class='pp-scroll'><table class='pp-table'><thead><tr><th>Tahun</th><th>Bil. murid</th><th data-field='tp1'>TP1</th><th data-field='tp2'>TP2</th><th data-field='tp3'>TP3</th><th data-field='tp4'>TP4</th><th data-field='tp5'>TP5</th><th data-field='tp6'>TP6</th><th data-field='bawah'>Di bawah TP3</th><th data-field='pct'>% TP3 ke atas</th></tr></thead><tbody data-draw='tb_pbd'></tbody></table></div>
+<p class='pp-note'>Sumber: Minit Mesyuarat Panitia Kali Ketiga 2026, bahagian 5.4.</p>
+</div>
+<div class='pp-card'>
+<h2>UASA 2026</h2>
+<p>GPMP keseluruhan <b data-draw='k_uasaGpmp'>—</b>; terbaik Tahun <b data-draw='k_uasaBest'>—</b>, paling lemah Tahun <b data-draw='k_uasaWorst'>—</b>. <b data-draw='k_uasaA'>—</b> daripada <b data-draw='k_uasaCalon'>—</b> calon (<b data-draw='k_uasaPctA'>—</b>%) Gred A. <b data-draw='k_uasaE'>—</b> murid Gred E dan <b data-draw='k_uasaTH'>—</b> murid tidak hadir.</p>
+<div class='pp-scroll'><table class='pp-table'><thead><tr><th>Tahun</th><th>Calon</th><th>Hadir</th><th data-field='a'>A</th><th data-field='b'>B</th><th data-field='c'>C</th><th data-field='d'>D</th><th data-field='e'>E</th><th data-field='th'>TH</th><th data-field='lulus'>% lulus</th><th data-field='gpmp'>GPMP</th></tr></thead><tbody data-draw='tb_uasa'></tbody></table></div>
+<p class='pp-note'>Sumber: minit ketiga 2026, bahagian 5.5. % lulus ialah gred A hingga E dibahagi murid hadir; GPMP jumlah ialah purata wajaran mengikut murid hadir.</p>
+</div>
+<div class='pp-grid2'>
+<div class='pp-card'><h3>Peringkat bacaan Al-Quran, semua murid</h3><div class='pp-chart' data-draw='quranchart'>—</div></div>
+<div class='pp-card'><h3>Pencapaian Al-Quran Tahun 6</h3><div class='pp-chart' data-draw='quran6chart'>—</div></div>
+<div class='pp-card'><h3>Penguasaan Jawi (TP)</h3><div class='pp-chart' data-draw='jawichart'>—</div></div>
+<div class='pp-card'><h3>Bacaan solat, amali wuduk dan amali solat</h3><div class='pp-chart' data-draw='solatchart'>—</div></div>
+</div>
+<p class='pp-note'>Sumber J-QAF (NADI), November 2026: minit ketiga bahagian 5.2 (599 murid; Tahun 6: 103 murid).</p>
+</section>
+
+<section id='t-intervensi' data-sec hidden>
+<div class='pp-card'>
+<h2>Intervensi dan penambahbaikan 2027</h2>
+<p class='pp-note'>Daripada cadangan intervensi dalam minit ketiga (bahagian 5.6). Tetapkan guru bertanggungjawab dan kemas kini status sepanjang tahun.</p>
+<div class='pp-bar'><button class='pp-btn pri' type='button' id='add-intv'>+ Tambah intervensi</button></div>
+<div class='pp-scroll'><table class='pp-table'><thead><tr><th>Isu</th><th>Intervensi</th><th>Sasaran</th><th>Guru bertanggungjawab</th><th>Tempoh</th><th>Status</th></tr></thead><tbody data-draw='tb_intv'></tbody></table></div>
+<form class='pp-ed' id='ed-intv' hidden>
+<h3>Butiran intervensi</h3>
+<div class='g'>
+<label>Isu<input name='isu' required></label>
+<label>Intervensi<input name='intervensi'></label>
+<label>Sasaran<input name='sasaran'></label>
+<label>Guru bertanggungjawab<input name='guru' list='dl-guru'></label>
+<label>Tempoh<input name='tempoh'></label>
+<label>Status<select name='status'><option>Belum mula</option><option>Sedang berjalan</option><option>Selesai</option><option>Tertunda</option></select></label>
+</div>
+<div class='pp-row'><button type='submit' class='pp-btn pri'>Simpan</button><button type='button' class='pp-btn' data-act='close'>Tutup</button><button type='button' class='pp-btn bad' data-act='del' hidden>Padam</button><button type='button' class='pp-btn bad' data-act='del2' hidden>Sahkan padam</button></div>
+<p class='pp-msg' hidden>Tidak disimpan. Kod edit salah atau tiada sambungan.</p>
+</form>
+</div>
+</section>
+
+<section id='t-guru' data-sec hidden>
+<div class='pp-card'>
+<h2>RPT 2027: seorang guru bagi setiap tahun</h2>
+<p class='pp-note'>Setiap guru bertanggungjawab ke atas RPT satu tahun. Isi jumlah unit RPT dan bilangan yang telah dilaksanakan; klik satu baris untuk mengemas kini.</p>
+<div class='pp-bar'><button class='pp-btn pri' type='button' id='add-rpt'>+ Tambah tahun</button></div>
+<div class='pp-scroll'><table class='pp-table'><thead><tr><th>Tahun</th><th>Guru RPT</th><th>Jumlah unit RPT</th><th>Telah dilaksanakan</th><th>% pelaksanaan</th><th>Tindakan susulan</th><th>Catatan</th></tr></thead><tbody data-draw='tb_rpt'></tbody></table></div>
+<form class='pp-ed' id='ed-rpt' hidden>
+<h3>Butiran RPT</h3>
+<div class='g'>
+<label>Tahun<input name='tahun' type='number' min='1' max='6'></label>
+<label>Guru RPT<input name='guru' list='dl-guru'></label>
+<label>Jumlah unit RPT<input name='jumlah' type='number' min='0'></label>
+<label>Telah dilaksanakan<input name='dilaksana' type='number' min='0'></label>
+<label>Tindakan susulan<input name='tindakan'></label>
+<label>Catatan<input name='catatan'></label>
+</div>
+<div class='pp-row'><button type='submit' class='pp-btn pri'>Simpan</button><button type='button' class='pp-btn' data-act='close'>Tutup</button><button type='button' class='pp-btn bad' data-act='del' hidden>Padam</button><button type='button' class='pp-btn bad' data-act='del2' hidden>Sahkan padam</button></div>
+<p class='pp-msg' hidden>Tidak disimpan. Kod edit salah atau tiada sambungan.</p>
+</form>
+</div>
+<div class='pp-card'>
+<h2>Guru mengajar 2027</h2>
+<p class='pp-note'>Cadangan guru mengajar PI 2027 daripada minit ketiga (bahagian 5.8).</p>
+<div class='pp-bar'><button class='pp-btn pri' type='button' id='add-guru'>+ Tambah kelas</button></div>
+<div class='pp-scroll'><table class='pp-table'><thead><tr><th>Kelas 2027</th><th>Guru mengajar PI</th><th>Catatan</th></tr></thead><tbody data-draw='tb_guru'></tbody></table></div>
+<form class='pp-ed' id='ed-guru' hidden>
+<h3>Butiran kelas</h3>
+<div class='g'>
+<label>No.<input name='no' type='number' min='0'></label>
+<label>Kelas 2027<input name='kelas' required></label>
+<label>Guru mengajar PI<input name='guru'></label>
+<label>Catatan<input name='catatan'></label>
+</div>
+<div class='pp-row'><button type='submit' class='pp-btn pri'>Simpan</button><button type='button' class='pp-btn' data-act='close'>Tutup</button><button type='button' class='pp-btn bad' data-act='del' hidden>Padam</button><button type='button' class='pp-btn bad' data-act='del2' hidden>Sahkan padam</button></div>
+<p class='pp-msg' hidden>Tidak disimpan. Kod edit salah atau tiada sambungan.</p>
+</form>
+</div>
+</section>
+
+<section id='t-kewangan' data-sec hidden>
+<div class='pp-card'>
+<h2>Peruntukan dan perbelanjaan</h2>
+<p class='pp-note'>Data 2026 daripada Akaun Subsidiari sehingga 2 November 2026 (minit ketiga, bahagian 5.1); terimaan termasuk baki bawa ke bawah 1 Januari 2026. Tambah baris dengan tahun 2027 apabila peruntukan diterima. Baki setiap peruntukan dipaparkan berasingan dan tidak dicampurkan.</p>
+<div class='pp-bar'><button class='pp-btn pri' type='button' id='add-kew'>+ Tambah peruntukan</button></div>
+<div class='pp-scroll'><table class='pp-table'><thead><tr><th>Tahun</th><th>Peruntukan</th><th>Terimaan (RM)</th><th>Belanja (RM)</th><th>Baki (RM)</th><th>% belanja</th><th>Catatan</th></tr></thead><tbody data-draw='tb_kew'></tbody></table></div>
+<form class='pp-ed' id='ed-kew' hidden>
+<h3>Butiran peruntukan</h3>
+<div class='g'>
+<label>Tahun<input name='tahun' type='number' min='2020' max='2100'></label>
+<label>Peruntukan<input name='nama' required></label>
+<label>Terimaan (RM)<input name='terima' type='number' min='0' step='0.01'></label>
+<label>Belanja (RM)<input name='belanja' type='number' min='0' step='0.01'></label>
+<label>Catatan<input name='catatan'></label>
+</div>
+<div class='pp-row'><button type='submit' class='pp-btn pri'>Simpan</button><button type='button' class='pp-btn' data-act='close'>Tutup</button><button type='button' class='pp-btn bad' data-act='del' hidden>Padam</button><button type='button' class='pp-btn bad' data-act='del2' hidden>Sahkan padam</button></div>
+<p class='pp-msg' hidden>Tidak disimpan. Kod edit salah atau tiada sambungan.</p>
+</form>
+</div>
+</section>
+</main></div></div>
+
+<script>
+/* ===== Sambungan Supabase dan lapisan data ===== */
+const SB_URL='https://pqydwortuesdwaklnyeg.supabase.co';
+const SB_KEY='sb_publishable_Imcgl-NSl6JjvvGlW2bzjA_K2m4HpaC';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const COLLS=['programs','pbd','uasa','petunjuk','kewangan','guru','quran','jawi','solat','intervensi','rpt'];
+const store={};COLLS.forEach(c=>store[c]=null);
+const calcs={},draws={},params={};
+let loadErr=false,raf=0;
+const dash={
+ colors:['#7c4dff','#0066ff','#00c853','#ff9100','#f50057'],
+ data(id){
+  if(calcs[id]){const c=calcs[id];const ins=c.inputs.map(i=>dash.data(i));
+   if(ins.some(x=>x.status==='error'))return {status:'error'};
+   if(ins.some(x=>x.status!=='ok'))return {status:'loading'};
+   try{return {status:'ok',data:c.fn(...ins.map(x=>x.data))};}catch(e){console.error(e);return {status:'error'};}}
+  if(id in store){if(loadErr&&store[id]===null)return {status:'error'};return store[id]===null?{status:'loading'}:{status:'ok',data:store[id]};}
+  return {status:'error'};
+ },
+ calc(id,o){calcs[id]=o;},
+ draw(name,fn){if(fn)draws[name]=fn;runDraw(name);},
+ params(){return params;},
+ setParams(o){Object.assign(params,o);Object.keys(params).forEach(k=>{if(params[k]===null)delete params[k];});renderAll();},
+ setLink(n){try{history.replaceState(null,'','#'+n);}catch(e){}}
+};
+function runDraw(name){const f=draws[name];if(!f)return;document.querySelectorAll('[data-draw="'+name+'"]').forEach(el=>{try{f(el);}catch(e){console.error(name,e);}});}
+function renderAll(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>Object.keys(draws).forEach(runDraw));}
+function applyRow(coll,id,data,del){
+ if(!store[coll])store[coll]=[];
+ const i=store[coll].findIndex(r=>r.id===id);
+ if(del){if(i>=0)store[coll].splice(i,1);}
+ else{const row=Object.assign({id:id},data);if(i>=0)store[coll][i]=row;else store[coll].push(row);}
+}
+const setSambung=(t,ok)=>{const e=document.getElementById('sambung');if(e){e.textContent=t;e.style.color=ok?'':'#e0002b';}};
+async function loadAll(){
+ const {data,error}=await sb.from('pp_rows').select('coll,id,data').limit(5000);
+ if(error){loadErr=true;setSambung('Gagal sambung',false);renderAll();return;}
+ loadErr=false;COLLS.forEach(c=>store[c]=[]);
+ data.forEach(r=>{if(store[r.coll])store[r.coll].push(Object.assign({id:r.id},r.data));});
+ setSambung('Tersambung · disimpan',true);renderAll();
+}
+sb.channel('pp-live').on('postgres_changes',{event:'*',schema:'public',table:'pp_rows'},p=>{
+ if(p.eventType==='DELETE'){const o=p.old||{};if(o.coll&&o.id)applyRow(o.coll,o.id,null,true);}
+ else if(p.new&&store[p.new.coll]!==undefined)applyRow(p.new.coll,p.new.id,p.new.data,false);
+ renderAll();
+}).subscribe();
+setInterval(()=>{if(document.visibilityState==='visible')loadAll();},60000);
+
+/* ===== Kod edit bersama ===== */
+const KEY='pp_kod_edit';
+const getCode=()=>{try{return localStorage.getItem(KEY)||'';}catch(e){return '';}};
+const setCode=v=>{try{if(v)localStorage.setItem(KEY,v);else localStorage.removeItem(KEY);}catch(e){}updLock();};
+function updLock(){const on=!!getCode();const k=document.getElementById('kunci'),t=document.getElementById('tukar');if(k)k.textContent=on?'🔓 Mod edit aktif':'🔒 Kod edit';if(t)t.hidden=!on;}
+async function askCode(){
+ const c=window.prompt('Masukkan kod edit panitia:');if(!c)return false;
+ const {data,error}=await sb.rpc('pp_semak',{kod:c});
+ if(error||data!==true){window.alert('Kod salah.');return false;}
+ setCode(c);return true;
+}
+async function write(op,coll,id,val){
+ let kod=getCode();if(!kod){if(!(await askCode()))throw new Error('tiada kod');kod=getCode();}
+ const {error}=await sb.rpc('pp_tulis',{kod:kod,op:op,tbl:coll,rid:id,nilai:val||{}});
+ if(error){if(/kod salah/.test(error.message))setCode('');throw error;}
+ if(op==='delete')applyRow(coll,id,null,true);
+ else if(op==='update'){const r=(store[coll]||[]).find(x=>x.id===id);applyRow(coll,id,Object.assign({},r||{},val),false);}
+ else applyRow(coll,id,val,false);
+ renderAll();
+}
+const newId=c=>c.slice(0,1)+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const claude={use:async()=>({
+ doc:p=>{const s=p.split('/'),c=s[2],id=s[3];return {set:d=>write('set',c,id,d),update:d=>write('update',c,id,d),delete:()=>write('delete',c,id,{})};},
+ collection:p=>{const c=p.split('/')[2];return {add:d=>write('set',c,newId(c),d)};}
+})};
+document.getElementById('kunci').addEventListener('click',async()=>{if(getCode()){setCode('');}else await askCode();});
+document.getElementById('tukar').addEventListener('click',async()=>{
+ const baru=window.prompt('Kod edit baharu (sekurang-kurangnya 6 aksara):');if(!baru)return;
+ const {error}=await sb.rpc('pp_tukar_kod',{lama:getCode(),baru:baru});
+ if(error){window.alert('Gagal menukar kod: '+error.message);return;}
+ setCode(baru);window.alert('Kod edit sudah ditukar. Beritahu guru panitia kod baharu.');
+});
+updLock();
+
+/* ===== Dashboard ===== */
+const MONTHS=['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogo','Sep','Okt','Nov','Dis'];
+const COLORS={'Belum mula':'#ff9100','Sedang berjalan':'#0066ff','Selesai':'#00c853','Tertunda':'#ff1744'};
+const CAT={'Sepanjang tahun':['#2979ff','🕌'],'Peningkatan murid':['#aa00ff','🎯'],'Perayaan':['#ffab00','🌙'],'Pentadbiran':['#00bfa5','📋'],'Pertandingan':['#f50057','🏆'],'Mesyuarat':['#304ffe','🤝'],'Pembangunan Guru (PLC)':['#00b8d4','👩‍🏫']};
+const num=v=>{const n=Number(v);return v===null||v===undefined||v===''||!Number.isFinite(n)?0:n;};
+const rows=id=>{const d=dash.data(id);return d.status==='ok'&&Array.isArray(d.data)?d.data:[];};
+const range=r=>{const a=Math.min(12,Math.max(1,num(r.mula)||1));const b=Math.min(12,Math.max(a,num(r.tamat)||a));return [a,b];};
+const spanTxt=r=>{const x=range(r);return x[0]===x[1]?MONTHS[x[0]-1]:MONTHS[x[0]-1]+'–'+MONTHS[x[1]-1];};
+const catOf=k=>CAT[k]||['#64748b','📌'];
+const DAYS=['Ahd','Isn','Sel','Rab','Kha','Jum','Sab'];
+const fmtDate=s=>{if(!s)return '';const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s));if(!m)return String(s);const d=new Date(+m[1],+m[2]-1,+m[3]);return DAYS[d.getDay()]+', '+(+m[3])+' '+MONTHS[+m[2]-1]+' '+m[1];};
+const GURU=['Zarila','Nor Azhanah','Zulkifli','Siti Nabilah','Azlina Faziera','Azima','Muhammad Adib','A’in Nazirah'];
+const GCOL=['#7c4dff','#0066ff','#00c853','#ff9100','#f50057','#aa00ff','#2979ff','#c51162'];
+const curMonth=()=>{const n=new Date();return n.getFullYear()===2027?n.getMonth()+1:(n.getFullYear()<2027?1:12);};
+
+dash.calc('kpi',{inputs:['programs','pbd','kewangan','rpt','uasa'],fn:(programs,pbd,kew,rpt,uasa)=>{
+ const N=v=>Number(v)||0;const r1=v=>Math.round(v*10)/10;const r2=v=>Math.round(v*100)/100;
+ const n=programs.length;
+ const c=s=>programs.filter(p=>p.status===s).length;
+ const psum=programs.reduce((a,p)=>a+N(p.peratus),0);
+ const by=pbd.map(r=>({t:r.tahun,b:N(r.tp1)+N(r.tp2),m:N(r.murid)}));
+ const murid=by.reduce((a,x)=>a+x.m,0);
+ const bawah=by.reduce((a,x)=>a+x.b,0);
+ const worst=by.reduce((a,x)=>!a||x.b>a.b?x:a,null);
+ const low=by.filter(x=>x.m>0).reduce((a,x)=>!a||(x.m-x.b)/x.m<(a.m-a.b)/a.m?x:a,null);
+ const gj=rpt.reduce((a,r)=>a+N(r.jumlah),0),gd=rpt.reduce((a,r)=>a+N(r.dilaksana),0);
+ const us=k=>uasa.reduce((a,r)=>a+N(r[k]),0);
+ const hadir=us('hadir'),calon=us('calon');
+ const gw=uasa.reduce((a,r)=>a+N(r.gpmp)*N(r.hadir),0);
+ const ug=uasa.filter(r=>N(r.hadir)>0);
+ const best=ug.reduce((a,r)=>!a||N(r.gpmp)<N(a.gpmp)?r:a,null);
+ const wrst=ug.reduce((a,r)=>!a||N(r.gpmp)>N(a.gpmp)?r:a,null);
+ return [{jumlah:n,selesai:c('Selesai'),berjalan:c('Sedang berjalan'),belum:c('Belum mula'),tertunda:c('Tertunda'),purata:n?r1(psum/n):0,pbdMurid:murid,pbdBawah:bawah,pbdPct:murid?r1((murid-bawah)/murid*100):0,worstTahun:worst?worst.t:null,worstN:worst?worst.b:0,lowTahun:low?low.t:null,lowPct:low?r1((low.m-low.b)/low.m*100):0,rptPct:gj?r1(gd/gj*100):null,uasaGpmp:hadir?r2(gw/hadir):null,uasaA:us('a'),uasaCalon:calon,uasaPctA:calon?r1(us('a')/calon*100):null,uasaE:us('e'),uasaTH:us('th'),uasaBest:best?best.tahun:null,uasaWorst:wrst?wrst.tahun:null}];
+}});
+dash.calc('pbdCalc',{inputs:['pbd'],fn:(pbd)=>{
+ const N=v=>Number(v)||0;const r1=v=>Math.round(v*10)/10;
+ const list=pbd.slice().sort((a,b)=>N(a.tahun)-N(b.tahun));
+ const out=list.map(r=>{const m=N(r.murid),b=N(r.tp1)+N(r.tp2);return {id:r.id,tahun:r.tahun,murid:m,tp1:N(r.tp1),tp2:N(r.tp2),tp3:N(r.tp3),tp4:N(r.tp4),tp5:N(r.tp5),tp6:N(r.tp6),bawah:b,pct:m?r1((m-b)/m*100):0};});
+ const t=k=>out.reduce((a,r)=>a+r[k],0);
+ const m=t('murid'),b=t('bawah');
+ out.push({id:'jumlah',tahun:'Jumlah',murid:m,tp1:t('tp1'),tp2:t('tp2'),tp3:t('tp3'),tp4:t('tp4'),tp5:t('tp5'),tp6:t('tp6'),bawah:b,pct:m?r1((m-b)/m*100):0});
+ return out;
+}});
+dash.calc('uasaCalc',{inputs:['uasa'],fn:(uasa)=>{
+ const N=v=>Number(v)||0;
+ const list=uasa.slice().sort((a,b)=>N(a.tahun)-N(b.tahun));
+ const pass=r=>N(r.a)+N(r.b)+N(r.c)+N(r.d)+N(r.e);
+ const out=list.map(r=>({id:r.id,tahun:r.tahun,calon:r.calon,hadir:r.hadir,a:r.a,b:r.b,c:r.c,d:r.d,e:r.e,th:r.th,lulus:N(r.hadir)?Math.round(pass(r)/N(r.hadir)*1000)/10:null,gpmp:r.gpmp}));
+ const t=k=>list.reduce((a,r)=>a+N(r[k]),0);
+ const hadir=t('hadir');
+ out.push({id:'jumlah',tahun:'Jumlah',calon:t('calon'),hadir:hadir,a:t('a'),b:t('b'),c:t('c'),d:t('d'),e:t('e'),th:t('th'),lulus:hadir?Math.round(list.reduce((a,r)=>a+pass(r),0)/hadir*1000)/10:null,gpmp:hadir?Math.round(list.reduce((a,r)=>a+N(r.gpmp)*N(r.hadir),0)/hadir*100)/100:null});
+ return out;
+}});
+dash.calc('petunjukCalc',{inputs:['petunjuk'],fn:(petunjuk)=>{
+ const N=v=>Number(v)||0;const has=v=>v!==null&&v!==undefined&&v!=='';
+ return petunjuk.slice().sort((a,b)=>N(a.no)-N(b.no)).map(r=>{
+  const hi=r.arah!=='rendah';const hs=has(r.semasa),ht=has(r.sasaran);
+  const u=hs?Math.round((N(r.semasa)-N(r.asas))*100)/100:null;
+  return {id:r.id,nama:r.nama,unit:r.unit,arah:r.arah,asas:r.asas,semasa:hs?r.semasa:null,sasaran:ht?r.sasaran:null,ubah:u,baik:u===null||u===0?null:(hi?u>0:u<0),capai:hs&&ht?((hi?N(r.semasa)>=N(r.sasaran):N(r.semasa)<=N(r.sasaran))?'Capai':'Belum capai'):null,catatan:r.catatan};
+ });
+}});
+dash.calc('rptCalc',{inputs:['rpt'],fn:(rpt)=>{
+ const N=v=>Number(v)||0;
+ return rpt.slice().sort((a,b)=>N(a.tahun)-N(b.tahun)).map(r=>{const j=N(r.jumlah);return {id:r.id,tahun:r.tahun,guru:r.guru,jumlah:r.jumlah,dilaksana:r.dilaksana,pct:j?Math.round(N(r.dilaksana)/j*1000)/10:null,tindakan:r.tindakan,catatan:r.catatan};});
+}});
+dash.calc('kewCalc',{inputs:['kewangan'],fn:(kew)=>{
+ const N=v=>Number(v)||0;const r2=v=>Math.round(v*100)/100;
+ return kew.slice().sort((a,b)=>N(b.tahun)-N(a.tahun)||String(a.nama).localeCompare(String(b.nama))).map(r=>({id:r.id,tahun:r.tahun,nama:r.nama,terima:r.terima,belanja:r.belanja,baki:r2(N(r.terima)-N(r.belanja)),pct:N(r.terima)?Math.round(N(r.belanja)/N(r.terima)*1000)/10:null,catatan:r.catatan}));
+}});
+
+['jumlah','selesai','berjalan','belum','tertunda','purata','pbdMurid','pbdBawah','pbdPct','worstTahun','worstN','lowTahun','lowPct','rptPct','uasaGpmp','uasaA','uasaCalon','uasaPctA','uasaE','uasaTH','uasaBest','uasaWorst'].forEach(f=>{
+ dash.draw('k_'+f,el=>{const d=dash.data('kpi');const r=d.status==='ok'&&d.data&&d.data[0];el.textContent=r&&r[f]!==null&&r[f]!==undefined?String(r[f]):'—';});
+});
+dash.draw('countdown',el=>{
+ const now=new Date(),start=new Date(2027,0,1);
+ if(now<start){el.textContent='Tinggal '+Math.ceil((start-now)/864e5)+' hari ke 1 Januari 2027';}
+ else{const day=Math.floor((now-start)/864e5)+1;el.textContent='Hari ke-'+day+' tahun 2027';}
+});
+
+function tip(el){const t=document.createElement('div');t.className='pp-tip';t.hidden=true;el.append(t);return {show:(ev,txt)=>{t.textContent=txt;t.hidden=false;const r=el.getBoundingClientRect();let x=ev.clientX-r.left+10;const y=ev.clientY-r.top+12;x=Math.min(x,Math.max(0,r.width-t.offsetWidth-4));t.style.left=x+'px';t.style.top=y+'px';},hide:()=>{t.hidden=true;}};}
+
+const qText=()=>String(dash.params().q||'').toLowerCase().trim();
+const matchQ=r=>{const q=qText();if(!q)return true;return [r.nama,r.kategori,r.pic,r.catatan,r.status].join(' ').toLowerCase().indexOf(q)>=0;};
+const byStart=(a,b)=>num(a.mula)-num(b.mula)||String(a.nama).localeCompare(String(b.nama));
+let selId=null;
+function cardList(all){const cur=curMonth();let l=all.filter(matchQ);if(!qText())l=l.filter(r=>r.status!=='Selesai'&&range(r)[1]>=cur);return l.slice().sort(byStart).slice(0,6);}
+function pickSel(all,l){if(!all.some(r=>r.id===selId))selId=l.length?l[0].id:null;return all.find(r=>r.id===selId)||null;}
+
+function tableDraw(name,src,cols,o){
+ dash.draw(name,tb=>{
+  const d=dash.data(src);tb.replaceChildren();
+  const msg=t=>{const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=cols.length;td.textContent=t;tr.append(td);tb.append(tr);};
+  if(d.status==='error'){msg('Gagal dimuatkan.');return;}
+  if(d.status!=='ok'){msg('Memuatkan…');return;}
+  let list=Array.isArray(d.data)?d.data:[];
+  if(o.filter)list=o.filter(list);
+  if(!list.length){msg(o.empty);return;}
+  list.forEach(r=>{
+   const tr=document.createElement('tr');tr.dataset.key=r.id;
+   if(r.id==='jumlah')tr.className='tot';
+   cols.forEach(c=>{const td=document.createElement('td');const v=c(r);if(v instanceof Node)td.append(v);else td.textContent=v===null||v===undefined||v===''?'—':String(v);tr.append(td);});
+   if(o.pick&&r.id!=='jumlah'){tr.classList.add('pick');tr.tabIndex=0;tr.onclick=()=>o.pick(r.id);tr.onkeydown=e=>{if(e.key==='Enter')o.pick(r.id);};}
+   tb.append(tr);
+  });
+ });
+}
+
+const ED={};
+function editor(cfg){
+ const form=document.getElementById(cfg.form);if(!form)return null;
+ const msg=form.querySelector('.pp-msg');
+ const btn=a=>form.querySelector('[data-act='+a+']');
+ let cur=null;
+ function open(id){
+  cur=id;
+  const r=id?rows(cfg.src).find(x=>x.id===id):null;
+  cfg.fields.forEach(f=>{const el=form.elements[f.n];if(!el)return;const v=r?r[f.n]:(cfg.defaults&&cfg.defaults[f.n]!==undefined?cfg.defaults[f.n]:'');el.value=v===null||v===undefined?'':v;});
+  form.hidden=false;msg.hidden=true;
+  if(btn('del'))btn('del').hidden=!id;
+  if(btn('del2'))btn('del2').hidden=true;
+  form.scrollIntoView({block:'nearest'});
+ }
+ form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const row={};
+  cfg.fields.forEach(f=>{const v=form.elements[f.n].value;row[f.n]=f.t==='n'?(v===''?null:Number(v)):v.trim();});
+  if(cfg.fix)cfg.fix(row);
+  try{
+   const db=await claude.use('db');
+   if(cur)await db.doc(cfg.path+'/'+cur).set(row);else await db.collection(cfg.path).add(row);
+   msg.hidden=true;form.hidden=true;
+  }catch(err){msg.hidden=false;}
+ });
+ form.addEventListener('click',async e=>{
+  const b=e.target.closest?e.target.closest('[data-act]'):null;if(!b)return;
+  const a=b.getAttribute('data-act');
+  if(a==='close')form.hidden=true;
+  if(a==='done'&&cfg.done)cfg.done(form.elements);
+  if(a==='del'&&btn('del2'))btn('del2').hidden=false;
+  if(a==='del2'&&cur){try{const db=await claude.use('db');await db.doc(cfg.path+'/'+cur).delete();msg.hidden=true;form.hidden=true;}catch(err){msg.hidden=false;}}
+ });
+ return {open:open};
+}
+const F=(names,numeric)=>names.map(n=>({n:n,t:numeric.indexOf(n)>=0?'n':'s'}));
+ED.programs=editor({form:'ed-programs',src:'programs',path:'data/team/programs',fields:F(['nama','kategori','tarikh','mula','tamat','pic','status','peratus','catatan'],['mula','tamat','peratus']),defaults:{kategori:'Peningkatan murid',mula:1,tamat:1,status:'Belum mula',peratus:0},fix:r=>{if(r.tarikh&&/^\d{4}-\d{2}/.test(r.tarikh)){const mm=+r.tarikh.slice(5,7);r.mula=mm;r.tamat=Math.max(mm,r.tamat||mm);}r.mula=Math.min(12,Math.max(1,r.mula||1));r.tamat=Math.min(12,Math.max(r.mula,r.tamat||r.mula));r.peratus=Math.min(100,Math.max(0,r.peratus||0));},done:f=>{f.status.value='Selesai';f.peratus.value=100;}});
+ED.pet=editor({form:'ed-pet',src:'petunjuk',path:'data/team/petunjuk',fields:F(['no','nama','unit','arah','asas','semasa','sasaran','catatan'],['no','asas','semasa','sasaran']),defaults:{unit:'%',arah:'tinggi'}});
+ED.intv=editor({form:'ed-intv',src:'intervensi',path:'data/team/intervensi',fields:F(['isu','intervensi','sasaran','guru','tempoh','status'],[]),defaults:{status:'Belum mula'}});
+ED.guru=editor({form:'ed-guru',src:'guru',path:'data/team/guru',fields:F(['no','kelas','guru','catatan'],['no'])});
+ED.rpt=editor({form:'ed-rpt',src:'rpt',path:'data/team/rpt',fields:F(['tahun','guru','jumlah','dilaksana','tindakan','catatan'],['tahun','jumlah','dilaksana']),defaults:{tahun:1}});
+ED.kew=editor({form:'ed-kew',src:'kewangan',path:'data/team/kewangan',fields:F(['tahun','nama','terima','belanja','catatan'],['tahun','terima','belanja']),defaults:{tahun:2027,terima:0,belanja:0},fix:r=>{r.tahun=Math.round(r.tahun||2027);r.terima=r.terima||0;r.belanja=r.belanja||0;}});
+[['add-pet','pet'],['add-intv','intv'],['add-guru','guru'],['add-rpt','rpt'],['add-kew','kew']].forEach(p=>{const b=document.getElementById(p[0]);if(b&&ED[p[1]])b.addEventListener('click',()=>ED[p[1]].open(null));});
+
+const badge=s=>{const e=document.createElement('span');e.className='pp-st';e.style.setProperty('--c',COLORS[s]||'#94a3b8');e.textContent=s||'Belum mula';return e;};
+const pill=(txt,c)=>{const e=document.createElement('span');e.className='pp-pill';e.style.background=c;e.textContent=txt;return e;};
+const progBar=p=>{const w=document.createElement('div');w.className='pp-prog';const em=document.createElement('em');const i=document.createElement('i');i.style.width=Math.min(100,Math.max(0,num(p)))+'%';em.append(i);const s=document.createElement('span');s.textContent=String(num(p));w.append(em,s);return w;};
+const cell=(v,bg,fg)=>{if(v===null||v===undefined||v==='')return null;const s=document.createElement('span');s.className='pp-cell';s.style.background=bg;s.style.color=fg||'#fff';s.textContent=String(v);return s;};
+const tpc=(k,bg,fg)=>r=>cell(r[k],bg,fg);
+
+tableDraw('tb_programs','programs',[r=>r.nama,r=>r.kategori,r=>spanTxt(r),r=>fmtDate(r.tarikh),r=>r.pic,r=>badge(r.status),r=>progBar(r.peratus),r=>r.catatan],{empty:'Belum ada program. Tekan Program baharu.',pick:id=>ED.programs&&ED.programs.open(id),filter:l=>{const s=dash.params().status,k=dash.params().kat;return l.filter(matchQ).filter(r=>!s||r.status===s).filter(r=>!k||r.kategori===k).sort(byStart);}});
+tableDraw('tb_pet','petunjukCalc',[r=>r.nama,r=>r.unit,r=>r.asas,r=>r.semasa,r=>r.sasaran,r=>{if(r.ubah===null||r.ubah===undefined)return null;const s=document.createElement('span');s.textContent=(r.ubah>0?'+':'')+r.ubah;if(r.baik===true)s.className='good';if(r.baik===false)s.className='poor';return s;},r=>{if(!r.capai)return null;const s=document.createElement('span');s.textContent=r.capai;s.className=r.capai==='Capai'?'good':'poor';return s;},r=>r.catatan],{empty:'Belum ada petunjuk.',pick:id=>ED.pet&&ED.pet.open(id)});
+tableDraw('tb_pbd','pbdCalc',[r=>r.tahun,r=>r.murid,tpc('tp1','#ff1744'),tpc('tp2','#ff9100','#222'),tpc('tp3','#b3d4ff','#222'),tpc('tp4','#66a6ff','#222'),tpc('tp5','#1a73ff'),tpc('tp6','#0b3bd1'),r=>cell(r.bawah,r.bawah>0?'#ff1744':'#0057ff'),r=>cell(r.pct+'%',num(r.pct)<95?'#ff9100':'#0057ff')],{empty:'Belum ada data PBD.'});
+tableDraw('tb_uasa','uasaCalc',[r=>r.tahun,r=>r.calon,r=>r.hadir,tpc('a','#00b8d4'),tpc('b','#2979ff'),tpc('c','#ffab00','#222'),tpc('d','#ff6d00'),tpc('e','#f50057'),tpc('th','#78909c'),r=>r.lulus===null?null:cell(r.lulus+'%',r.lulus>=100?'#0057ff':'#ff9100'),r=>r.gpmp===null||r.gpmp===undefined?null:cell(r.gpmp,'#7c4dff')],{empty:'Belum ada data UASA.'});
+tableDraw('tb_intv','intervensi',[r=>r.isu,r=>r.intervensi,r=>r.sasaran,r=>r.guru,r=>r.tempoh,r=>badge(r.status)],{empty:'Belum ada intervensi. Tekan Tambah intervensi.',pick:id=>ED.intv&&ED.intv.open(id)});
+tableDraw('tb_rpt','rptCalc',[r=>'Tahun '+r.tahun,r=>r.guru,r=>r.jumlah,r=>r.dilaksana,r=>r.pct,r=>r.tindakan,r=>r.catatan],{empty:'Belum ada RPT. Tekan Tambah tahun.',pick:id=>ED.rpt&&ED.rpt.open(id)});
+tableDraw('tb_guru','guru',[r=>r.kelas,r=>r.guru,r=>r.catatan],{empty:'Belum ada kelas. Tekan Tambah kelas.',pick:id=>ED.guru&&ED.guru.open(id),filter:l=>l.slice().sort((a,b)=>(a.no==null?9999:num(a.no))-(b.no==null?9999:num(b.no)))});
+tableDraw('tb_kew','kewCalc',[r=>r.tahun,r=>r.nama,r=>r.terima,r=>r.belanja,r=>r.baki,r=>r.pct,r=>r.catatan],{empty:'Belum ada peruntukan. Tekan Tambah peruntukan.',pick:id=>ED.kew&&ED.kew.open(id)});
+
+dash.draw('cards',el=>{
+ const d=dash.data('programs');el.replaceChildren();
+ if(d.status==='error'){el.textContent='Gagal dimuatkan.';return;}
+ if(d.status!=='ok'){el.textContent='Memuatkan…';return;}
+ const l=cardList(d.data);pickSel(d.data,l);
+ if(!l.length){el.textContent=qText()?'Tiada program sepadan dengan carian.':'Tiada program akan datang. Tekan Program baharu untuk menambah.';return;}
+ l.forEach(r=>{
+  const c=catOf(r.kategori);
+  const card=document.createElement('div');card.className='pp-pc'+(r.id===selId?' sel':'');card.tabIndex=0;
+  const band=document.createElement('div');band.className='pp-band';band.style.background='linear-gradient(135deg,'+c[0]+','+c[0]+'99)';
+  const dt=document.createElement('span');dt.className='pp-date';dt.textContent=spanTxt(r);
+  const em=document.createElement('em');em.textContent=c[1];
+  band.append(dt,em);
+  const body=document.createElement('div');body.className='pp-pcb';
+  const t=document.createElement('b');t.textContent=r.nama||'';
+  const m=document.createElement('small');m.textContent=(r.kategori||'')+(r.pic?' · '+r.pic:'');
+  const row=document.createElement('div');row.append(badge(r.status));
+  body.append(t,m,row,progBar(r.peratus));
+  card.append(band,body);
+  const go=()=>{selId=r.id;runDraw('cards');runDraw('detail');};
+  card.onclick=go;card.onkeydown=e=>{if(e.key==='Enter')go();};
+  el.append(card);
+ });
+});
+
+dash.draw('detail',el=>{
+ const d=dash.data('programs');el.replaceChildren();
+ if(d.status!=='ok'){el.textContent=d.status==='error'?'Gagal dimuatkan.':'Memuatkan…';return;}
+ const r=pickSel(d.data,cardList(d.data));
+ if(!r){el.textContent='Belum ada program dipilih.';return;}
+ const c=catOf(r.kategori);
+ const h=document.createElement('div');h.append(pill((c[1]+' '+(r.kategori||'')).trim(),c[0]));
+ const t=document.createElement('h3');t.style.margin='8px 0 0';t.style.fontSize='16px';t.textContent=r.nama||'';
+ const dl=document.createElement('div');dl.className='dl';
+ const add=(k,v)=>{const a=document.createElement('span');a.textContent=k;const b=document.createElement('div');if(v instanceof Node)b.append(v);else b.textContent=v||'—';dl.append(a,b);};
+ add('Tempoh',spanTxt(r)+' 2027');add('Tarikh cadangan',fmtDate(r.tarikh));add('Penyelaras',r.pic);add('Status',badge(r.status));add('Kemajuan (%)',progBar(r.peratus));add('Catatan',r.catatan);
+ el.append(h,t,dl);
+});
+
+dash.draw('trendchart',el=>{
+ const d=dash.data('programs');el.replaceChildren();
+ if(d.status==='error'){el.textContent='Gagal dimuatkan.';return;}
+ if(d.status!=='ok'){el.textContent='—';return;}
+ const counts=MONTHS.map((m,i)=>d.data.filter(r=>{const x=range(r);return x[0]<=i+1&&x[1]>=i+1;}).length);
+ const mx=Math.max(1,...counts);
+ const W=Math.max(220,el.clientWidth||320),H=170,pl=24,pb=22,pt=18,bw=(W-pl)/12;
+ const t=tip(el);
+ const svg=d3.select(el).append('svg').attr('width',W).attr('height',H).attr('role','img').attr('aria-label','Carta bilangan program aktif setiap bulan');
+ svg.append('line').attr('x1',pl).attr('x2',W).attr('y1',H-pb).attr('y2',H-pb).style('stroke','var(--cds-chart-axis)');
+ svg.append('text').attr('x',pl-4).attr('y',pt+4).attr('text-anchor','end').text(mx);
+ svg.append('text').attr('x',pl-4).attr('y',H-pb+4).attr('text-anchor','end').text(0);
+ counts.forEach((n,i)=>{
+  const h=(H-pb-pt)*n/mx,x=pl+i*bw+bw*0.15,w=bw*0.7;
+  svg.append('rect').attr('x',x).attr('y',H-pb-h).attr('width',w).attr('height',Math.max(n>0?2:0,h)).attr('rx',3).style('fill','#7c4dff').on('mousemove',ev=>t.show(ev,MONTHS[i]+': '+n+' program')).on('mouseleave',()=>t.hide());
+  if(bw>=18&&n>0)svg.append('text').attr('x',x+w/2).attr('y',H-pb-h-4).attr('text-anchor','middle').text(n);
+  svg.append('text').attr('x',x+w/2).attr('y',H-6).attr('text-anchor','middle').text(bw<24?MONTHS[i][0]:MONTHS[i]);
+ });
+});
+
+dash.draw('statusdonut',el=>{
+ const d=dash.data('programs');el.replaceChildren();
+ if(d.status==='error'){el.textContent='Gagal dimuatkan.';return;}
+ if(d.status!=='ok'){el.textContent='—';return;}
+ const names=['Sedang berjalan','Selesai','Belum mula','Tertunda'];
+ const data=names.map(s=>({s:s,n:d.data.filter(r=>r.status===s).length}));
+ const total=d.data.length;
+ if(!total){el.textContent='Belum ada program.';return;}
+ const wrap=document.createElement('div');wrap.className='pp-donut';
+ const R=70,t=tip(el);
+ const svg=d3.select(wrap).append('svg').attr('width',R*2+4).attr('height',R*2+4).attr('role','img').attr('aria-label','Carta donat status program');
+ const g=svg.append('g').attr('transform','translate('+(R+2)+','+(R+2)+')');
+ const arc=d3.arc().innerRadius(R*0.62).outerRadius(R);
+ g.selectAll('path').data(d3.pie().value(x=>x.n).sort(null)(data.filter(x=>x.n>0))).join('path').attr('d',arc).style('fill',x=>COLORS[x.data.s]).on('mousemove',(ev,x)=>t.show(ev,x.data.s+': '+x.data.n+' program')).on('mouseleave',()=>t.hide());
+ g.append('text').attr('text-anchor','middle').attr('y',2).style('font-size','24px').style('font-weight','700').style('fill','var(--color-fg)').text(total);
+ g.append('text').attr('text-anchor','middle').attr('y',18).text('Program');
+ const ul=document.createElement('ul');
+ data.forEach(x=>{const li=document.createElement('li');const i=document.createElement('i');i.style.cssText='display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;background:'+COLORS[x.s];li.append(i,document.createTextNode(x.s+': '+x.n+' ('+Math.round(x.n/total*100)+'%)'));ul.append(li);});
+ wrap.append(ul);el.append(wrap);
+});
+
+function hbarDraw(name,src,map,max){
+ dash.draw(name,el=>{
+  const d=dash.data(src);el.replaceChildren();
+  if(d.status==='error'){el.textContent='Gagal dimuatkan.';return;}
+  if(d.status!=='ok'){el.textContent='—';return;}
+  const list=map(Array.isArray(d.data)?d.data:[]);
+  if(!list.length){el.textContent='Belum ada data.';return;}
+  const mx=max||Math.max(1,...list.map(x=>x.v));
+  const W=Math.max(220,el.clientWidth||320),lw=W<340?72:104,rw=W<340?62:84,rh=26,bw=Math.max(30,W-lw-rw-8),H=list.length*rh+6;
+  const t=tip(el);
+  const svg=d3.select(el).append('svg').attr('width',W).attr('height',H).attr('role','img').attr('aria-label','Carta bar: '+list.map(x=>x.label+' '+x.text).join(', '));
+  list.forEach((x,i)=>{
+   const y=i*rh+3,w=Math.max(x.v>0?2:0,x.v/mx*bw);
+   svg.append('text').attr('x',lw-8).attr('y',y+rh/2+3).attr('text-anchor','end').text(x.label.length>Math.floor((lw-10)/6.2)?x.label.slice(0,Math.floor((lw-10)/6.2)-1)+'…':x.label);
+   svg.append('rect').attr('x',lw).attr('y',y).attr('width',w).attr('height',rh-6).attr('rx',4).style('fill',x.c||dash.colors[0]).on('mousemove',ev=>t.show(ev,x.tip||(x.label+': '+x.text))).on('mouseleave',()=>t.hide());
+   svg.append('text').attr('x',lw+w+6).attr('y',y+rh/2+3).text(x.text);
+  });
+ });
+}
+const qmap=k=>rows=>{const l=rows.filter(r=>r.kumpulan===k).sort((a,b)=>num(a.susun)-num(b.susun));const tot=l.reduce((a,r)=>a+num(r.bil),0)||1;return l.map(r=>({label:r.label,v:num(r.bil),text:num(r.bil)+' ('+Math.round(num(r.bil)/tot*1000)/10+'%)'}));};
+hbarDraw('quranchart','quran',qmap('semua'));
+hbarDraw('quran6chart','quran',qmap('t6'));
+hbarDraw('jawichart','jawi',rows=>{const l=rows.slice().sort((a,b)=>num(a.susun)-num(b.susun));const tot=l.reduce((a,r)=>a+num(r.bil),0)||1;return l.map(r=>({label:r.label,v:num(r.bil),text:num(r.bil)+' ('+Math.round(num(r.bil)/tot*1000)/10+'%)'}));});
+hbarDraw('pbdbar','pbdCalc',rows=>rows.filter(r=>r.id!=='jumlah').map(r=>({label:'Tahun '+r.tahun,v:num(r.pct),text:num(r.pct)+'%',c:num(r.pct)<95?'#ff9100':'#0057ff'})),100);
+
+dash.draw('gantt',el=>{
+ const d=dash.data('programs');el.replaceChildren();
+ if(d.status==='error'){el.textContent='Gagal dimuatkan.';return;}
+ if(d.status!=='ok'){el.textContent='—';return;}
+ const list=d.data.slice().sort(byStart);
+ if(!list.length){el.textContent='Belum ada program.';return;}
+ const W=Math.max(300,el.clientWidth||640),lw=W<520?110:230,rw=40,top=22,rh=26,H=top+list.length*rh+4,cw=(W-lw-rw-8)/12;
+ const t=tip(el);
+ const svg=d3.select(el).append('svg').attr('width',W).attr('height',H).attr('role','img').attr('aria-label','Carta jadual program panitia 2027 mengikut bulan');
+ MONTHS.forEach((m,i)=>{svg.append('text').attr('x',lw+i*cw+cw/2).attr('y',14).attr('text-anchor','middle').text(cw<26?m[0]:m);svg.append('line').attr('x1',lw+i*cw).attr('x2',lw+i*cw).attr('y1',top-4).attr('y2',H).style('stroke','var(--cds-chart-grid)');});
+ const maxc=Math.floor((lw-14)/6.6);
+ list.forEach((r,i)=>{
+  const y=top+i*rh,x=range(r),c=COLORS[r.status]||COLORS['Belum mula'],p=Math.min(100,Math.max(0,num(r.peratus)));
+  const nm=String(r.nama||'');
+  svg.append('text').attr('x',lw-8).attr('y',y+rh/2+4).attr('text-anchor','end').text(nm.length>maxc?nm.slice(0,maxc-1)+'…':nm);
+  const bx=lw+(x[0]-1)*cw+1,bw=(x[1]-x[0]+1)*cw-2;
+  const g=svg.append('g').style('cursor','default');
+  g.append('rect').attr('x',bx).attr('y',y+5).attr('width',bw).attr('height',rh-10).attr('rx',4).style('fill',c).style('opacity',0.28);
+  if(p>0)g.append('rect').attr('x',bx).attr('y',y+5).attr('width',bw*p/100).attr('height',rh-10).attr('rx',4).style('fill',c);
+  g.append('text').attr('x',W-4).attr('y',y+rh/2+4).attr('text-anchor','end').text(p+'%');
+  g.append('rect').attr('x',lw).attr('y',y).attr('width',W-lw-rw).attr('height',rh).style('fill','transparent').on('mousemove',ev=>t.show(ev,nm+' · '+spanTxt(r)+' · '+(r.status||'Belum mula')+' · '+p+'%')).on('mouseleave',()=>t.hide());
+ });
+ const now=new Date();
+ if(now.getFullYear()===2027){const nx=lw+(now.getMonth()+(now.getDate()-1)/31)*cw;svg.append('line').attr('x1',nx).attr('x2',nx).attr('y1',top-4).attr('y2',H).style('stroke','var(--color-bad)').style('stroke-width',1.5);}
+});
+
+dash.draw('pbdchart',el=>{
+ const d=dash.data('pbd');el.replaceChildren();
+ if(d.status==='error'){el.textContent='Gagal dimuatkan.';return;}
+ if(d.status!=='ok'){el.textContent='—';return;}
+ const list=d.data.slice().sort((a,b)=>num(a.tahun)-num(b.tahun)).filter(r=>num(r.murid)>0);
+ if(!list.length){el.textContent='Belum ada data PBD.';return;}
+ const W=Math.max(260,el.clientWidth||640),lw=60,rh=28,H=list.length*rh+6,bw=W-lw-8;
+ const cols=['#ff1744','#ff9100','#b3d4ff','#66a6ff','#1a73ff','#0b3bd1'],ink=['#fff','#222','#222','#222','#fff','#fff'];
+ const t=tip(el);
+ const svg=d3.select(el).append('svg').attr('width',W).attr('height',H).attr('role','img').attr('aria-label','Carta peratus murid mengikut TP bagi setiap tahun, PBD akhir 2026');
+ list.forEach((r,i)=>{
+  const y=i*rh+3,m=num(r.murid);let x=lw;
+  svg.append('text').attr('x',lw-8).attr('y',y+rh/2+3).attr('text-anchor','end').text('Tahun '+r.tahun);
+  for(let k=1;k<=6;k++){
+   const n=num(r['tp'+k]);if(n<=0)continue;const w=n/m*bw;
+   const g=svg.append('g');
+   g.append('rect').attr('x',x).attr('y',y).attr('width',Math.max(0,w-1)).attr('height',rh-6).style('fill',cols[k-1]).on('mousemove',ev=>t.show(ev,'Tahun '+r.tahun+' · TP'+k+': '+n+' murid ('+Math.round(n/m*1000)/10+'%)')).on('mouseleave',()=>t.hide());
+   if(w>=20)g.append('text').attr('x',x+w/2).attr('y',y+rh/2).attr('text-anchor','middle').style('fill',ink[k-1]).style('pointer-events','none').text(n);
+   x+=w;
+  }
+ });
+ const lg=document.createElement('div');lg.className='pp-legend';
+ cols.forEach((c,i)=>{const s=document.createElement('span');const b=document.createElement('i');b.style.background=c;s.append(b,document.createTextNode('TP'+(i+1)));lg.append(s);});
+ el.append(lg);
+});
+
+dash.draw('solatchart',el=>{
+ const d=dash.data('solat');el.replaceChildren();
+ if(d.status==='error'){el.textContent='Gagal dimuatkan.';return;}
+ if(d.status!=='ok'){el.textContent='—';return;}
+ const list=d.data.slice().sort((a,b)=>num(a.susun)-num(b.susun));
+ if(!list.length){el.textContent='Belum ada data.';return;}
+ const W=Math.max(240,el.clientWidth||640),lw=W<340?78:110,rh=28,H=list.length*rh+6,bw=W-lw-8;
+ const cols=['#00c853','#ff1744','#ffab00'],names=['Menguasai','Belum menguasai','Belum dinilai'],keys=['menguasai','belum','belumDinilai'];
+ const t=tip(el);
+ const svg=d3.select(el).append('svg').attr('width',W).attr('height',H).attr('role','img').attr('aria-label','Carta penguasaan bacaan solat, amali wuduk dan amali solat');
+ list.forEach((r,i)=>{
+  const y=i*rh+3,m=keys.reduce((a,k)=>a+num(r[k]),0)||1;let x=lw;
+  svg.append('text').attr('x',lw-8).attr('y',y+rh/2+3).attr('text-anchor','end').text(r.aspek);
+  keys.forEach((k,j)=>{
+   const n=num(r[k]);if(n<=0)return;const w=n/m*bw;
+   const g=svg.append('g');
+   g.append('rect').attr('x',x).attr('y',y).attr('width',Math.max(0,w-1)).attr('height',rh-6).style('fill',cols[j]).on('mousemove',ev=>t.show(ev,r.aspek+' · '+names[j]+': '+n+' murid ('+Math.round(n/m*1000)/10+'%)')).on('mouseleave',()=>t.hide());
+   if(w>=44)g.append('text').attr('x',x+w/2).attr('y',y+rh/2).attr('text-anchor','middle').style('fill','#fff').style('pointer-events','none').text(n);
+   x+=w;
+  });
+ });
+ const lg=document.createElement('div');lg.className='pp-legend';
+ cols.forEach((c,i)=>{const s=document.createElement('span');const b=document.createElement('i');b.style.background=c;s.append(b,document.createTextNode(names[i]));lg.append(s);});
+ el.append(lg);
+});
+
+dash.draw('progdonut',el=>{
+ const d=dash.data('programs');el.replaceChildren();
+ if(d.status==='error'){el.textContent='Gagal dimuatkan.';return;}
+ if(d.status!=='ok'){el.textContent='—';return;}
+ const total=d.data.length;
+ if(!total){el.textContent='Belum ada program.';return;}
+ const names=['Selesai','Sedang berjalan','Belum mula','Tertunda'];
+ const data=names.map(s=>({s:s,n:d.data.filter(r=>r.status===s).length}));
+ const cnt=s=>data.find(x=>x.s===s).n;
+ const pct=n=>Math.round(n/total*100);
+ const ran=pct(cnt('Selesai')+cnt('Sedang berjalan'));
+ const avg=Math.round(d.data.reduce((a,r)=>a+Math.min(100,Math.max(0,num(r.peratus))),0)/total*10)/10;
+ const wrap=document.createElement('div');wrap.className='pp-donut';
+ const R=84,t=tip(el);
+ const svg=d3.select(wrap).append('svg').attr('width',R*2+4).attr('height',R*2+4).attr('role','img').attr('aria-label','Carta donat status program: '+ran+' peratus sudah berjalan');
+ const g=svg.append('g').attr('transform','translate('+(R+2)+','+(R+2)+')');
+ const arc=d3.arc().innerRadius(R*0.58).outerRadius(R);
+ const arcs=d3.pie().value(x=>x.n).sort(null)(data.filter(x=>x.n>0));
+ g.selectAll('path').data(arcs).join('path').attr('d',arc).style('fill',x=>COLORS[x.data.s]).on('mousemove',(ev,x)=>t.show(ev,x.data.s+': '+x.data.n+' program ('+pct(x.data.n)+'%)')).on('mouseleave',()=>t.hide());
+ g.selectAll('text.sl').data(arcs.filter(x=>x.data.n/total>=0.08)).join('text').attr('class','sl').attr('transform',x=>'translate('+arc.centroid(x)+')').attr('text-anchor','middle').attr('dy',4).style('fill','#fff').style('font-weight','700').style('pointer-events','none').text(x=>pct(x.data.n)+'%');
+ g.append('text').attr('text-anchor','middle').attr('y',4).style('font-size','30px').style('font-weight','700').style('fill','var(--color-fg)').text(ran+'%');
+ g.append('text').attr('text-anchor','middle').attr('y',22).text('sudah berjalan');
+ const ul=document.createElement('ul');
+ data.forEach(x=>{const li=document.createElement('li');const i=document.createElement('i');i.style.cssText='display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;background:'+COLORS[x.s];li.append(i,document.createTextNode(x.s+': '+x.n+' program ('+pct(x.n)+'%)'));ul.append(li);});
+ const li2=document.createElement('li');li2.style.marginTop='6px';li2.style.fontWeight='600';li2.textContent='Kemajuan purata semua program: '+avg+'%';ul.append(li2);
+ wrap.append(ul);el.append(wrap);
+});
+hbarDraw('catbars','programs',rows=>{
+ const cats=[];rows.forEach(r=>{const k=r.kategori||'Lain-lain';if(cats.indexOf(k)<0)cats.push(k);});
+ return cats.map(k=>{const l=rows.filter(r=>(r.kategori||'Lain-lain')===k);const a=Math.round(l.reduce((s,r)=>s+Math.min(100,Math.max(0,num(r.peratus))),0)/l.length*10)/10;const done=l.filter(r=>r.status==='Selesai').length;return {label:k,v:a,text:a+'% · '+l.length,c:catOf(k)[0],tip:k+': '+l.length+' program, '+done+' selesai, purata '+a+'%'};}).sort((x,y)=>y.v-x.v);
+},100);
+
+dash.draw('bebanchart',el=>{
+ const dp=dash.data('programs'),di=dash.data('intervensi');el.replaceChildren();
+ if(dp.status==='error'||di.status==='error'){el.textContent='Gagal dimuatkan.';return;}
+ if(dp.status!=='ok'||di.status!=='ok'){el.textContent='—';return;}
+ const norm=s=>s.replace(/[’']/g,'').toLowerCase();
+ const cnt=(list,key)=>{const m={};GURU.forEach(g=>m[g]=0);list.forEach(r=>String(r[key]||'').split(',').map(s=>s.trim()).filter(Boolean).forEach(n=>{const g=GURU.find(x=>norm(x)===norm(n));if(g)m[g]++;}));return m;};
+ const a=cnt(dp.data,'pic'),b=cnt(di.data,'guru');
+ const W=Math.max(240,el.clientWidth||320),lw=W<340?80:110,rw=30,rh=26,bw=Math.max(30,W-lw-rw-8),H=GURU.length*rh+6;
+ const tot=GURU.map(g=>a[g]+b[g]);const mx=Math.max(1,...tot);
+ const t=tip(el);
+ const svg=d3.select(el).append('svg').attr('width',W).attr('height',H).attr('role','img').attr('aria-label','Carta beban tugas Penyelaras: '+GURU.map((g,i)=>g+' '+tot[i]).join(', '));
+ GURU.forEach((g,i)=>{
+  const y=i*rh+3,w1=a[g]/mx*bw,w2=b[g]/mx*bw;
+  svg.append('text').attr('x',lw-8).attr('y',y+rh/2+3).attr('text-anchor','end').text(g.length>Math.floor((lw-10)/6.2)?g.slice(0,Math.floor((lw-10)/6.2)-1)+'…':g);
+  const tp='Penyelaras '+g+': '+a[g]+' program + '+b[g]+' intervensi';
+  svg.append('rect').attr('x',lw).attr('y',y).attr('width',w1).attr('height',rh-6).attr('rx',4).style('fill',GCOL[i]).on('mousemove',ev=>t.show(ev,tp)).on('mouseleave',()=>t.hide());
+  if(b[g]>0)svg.append('rect').attr('x',lw+w1).attr('y',y).attr('width',w2).attr('height',rh-6).style('fill',GCOL[i]).style('opacity',0.45).on('mousemove',ev=>t.show(ev,tp)).on('mouseleave',()=>t.hide());
+  svg.append('text').attr('x',lw+w1+w2+6).attr('y',y+rh/2+3).text(tot[i]);
+ });
+ const lg=document.createElement('div');lg.className='pp-legend';lg.textContent='Warna penuh = program; pudar = intervensi.';el.append(lg);
+});
+
+dash.draw('overall',el=>{
+ const d=dash.data('programs');el.replaceChildren();
+ if(d.status==='error'){el.textContent='Gagal dimuatkan.';return;}
+ if(d.status!=='ok'){el.textContent='—';return;}
+ const n=d.data.length;if(!n){el.textContent='Belum ada program.';return;}
+ const avg=Math.round(d.data.reduce((s,r)=>s+Math.min(100,Math.max(0,num(r.peratus))),0)/n*10)/10;
+ const big=document.createElement('div');big.style.cssText='display:flex;align-items:baseline;gap:10px;flex-wrap:wrap';
+ const v=document.createElement('b');v.style.cssText='font-size:38px;line-height:1;color:#6200ea';v.textContent=avg+'%';
+ const sp=document.createElement('span');sp.className='pp-lab';sp.textContent='kemajuan purata '+n+' program panitia';
+ big.append(v,sp);
+ const bar=document.createElement('div');bar.style.cssText='height:14px;border-radius:7px;background:var(--color-border-line);margin:10px 0;overflow:hidden';
+ const fill=document.createElement('div');fill.style.cssText='height:14px;width:'+avg+'%;background:linear-gradient(90deg,#00c853,#0066ff,#aa00ff)';bar.append(fill);
+ const stack=document.createElement('div');stack.style.cssText='display:flex;height:12px;border-radius:6px;overflow:hidden;gap:2px';
+ const t=tip(el);const parts=['Selesai','Sedang berjalan','Belum mula','Tertunda'];
+ const lg=document.createElement('div');lg.className='pp-legend';
+ parts.forEach(s=>{const c=d.data.filter(r=>r.status===s).length;if(c){const seg=document.createElement('div');seg.style.cssText='flex:'+c+';background:'+COLORS[s];seg.onmousemove=ev=>t.show(ev,s+': '+c+' program');seg.onmouseleave=()=>t.hide();stack.append(seg);}
+  const sw=document.createElement('span');const i=document.createElement('i');i.style.background=COLORS[s];sw.append(i,document.createTextNode(s+': '+c));lg.append(sw);});
+ el.append(big,bar,stack,lg);
+});
+
+const tabs=Array.from(document.querySelectorAll('.pp-nav'));
+const secs=Array.from(document.querySelectorAll('[data-sec]'));
+let curTab='utama';
+let full=false;
+function show(name){
+ curTab=name;
+ secs.forEach(s=>{s.hidden=full?false:s.id!=='t-'+name;});
+ tabs.forEach(b=>{const on=b.getAttribute('data-tab')===name;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false');});
+ dash.setLink(name);renderAll();
+ if(full){const el=document.getElementById('t-'+name);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+}
+const pb=document.getElementById('penuh');
+if(pb)pb.addEventListener('click',()=>{full=!full;pb.textContent=full?'🗂️ Paparan tab':'📄 Paparan penuh';show(curTab);if(!full)window.scrollTo({top:0});});
+tabs.forEach(b=>b.addEventListener('click',()=>show(b.getAttribute('data-tab'))));
+const addP=document.getElementById('add-programs');
+if(addP)addP.addEventListener('click',()=>{show('program');if(ED.programs)ED.programs.open(null);});
+const de=document.getElementById('det-edit');
+if(de)de.addEventListener('click',()=>{if(selId){show('program');if(ED.programs)ED.programs.open(selId);}});
+const dd=document.getElementById('det-done'),dm=document.getElementById('det-msg');
+if(dd)dd.addEventListener('click',async()=>{
+ if(!selId)return;
+ try{const db=await claude.use('db');await db.doc('data/team/programs/'+selId).update({status:'Selesai',peratus:100});dm.hidden=true;}catch(err){dm.hidden=false;}
+});
+const fs=document.getElementById('f-status');
+if(fs)fs.addEventListener('change',()=>dash.setParams({status:fs.value||null}));
+const fk=document.getElementById('f-kat');
+if(fk)fk.addEventListener('change',()=>dash.setParams({kat:fk.value||null}));
+const qi=document.getElementById('q');
+if(qi)qi.addEventListener('input',()=>dash.setParams({q:qi.value.trim()||null}));
+const h0=(location.hash||'').replace('#','');
+if(h0&&tabs.some(b=>b.getAttribute('data-tab')===h0))show(h0);
+window.addEventListener('beforeprint',()=>secs.forEach(s=>{s.hidden=false;}));
+window.addEventListener('afterprint',()=>show(curTab));
+let rz;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(renderAll,200);});
+loadAll();
+</script>
+</body>
+</html>
