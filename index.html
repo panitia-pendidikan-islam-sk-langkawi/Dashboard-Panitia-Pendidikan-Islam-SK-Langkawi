@@ -524,8 +524,9 @@ function tableDraw(name,src,cols,o){
   if(d.status==='error'){msg('Gagal dimuatkan.');return;}
   if(d.status!=='ok'){msg('Memuatkan…');return;}
   let list=Array.isArray(d.data)?d.data:[];
+  const n0=list.length;
   if(o.filter)list=o.filter(list);
-  if(!list.length){msg(o.empty);return;}
+  if(!list.length){msg(n0?'Tiada program sepadan dengan carian atau tapisan.':o.empty);return;}
   list.forEach(r=>{
    const tr=document.createElement('tr');tr.dataset.key=r.id;
    if(r.id==='jumlah')tr.className='tot';
@@ -909,7 +910,7 @@ if(fs)fs.addEventListener('change',()=>dash.setParams({status:fs.value||null}));
 const fk=document.getElementById('f-kat');
 if(fk)fk.addEventListener('change',()=>dash.setParams({kat:fk.value||null}));
 const qi=document.getElementById('q');
-if(qi)qi.addEventListener('input',()=>dash.setParams({q:qi.value.trim()||null}));
+if(qi)qi.addEventListener('input',()=>{const v=qi.value.trim();if(v&&!full&&curTab!=='program')show('program');dash.setParams({q:v||null});});
 const h0=(location.hash||'').replace('#','');
 if(h0&&tabs.some(b=>b.getAttribute('data-tab')===h0))show(h0);
 window.addEventListener('beforeprint',()=>secs.forEach(s=>{s.hidden=false;}));
