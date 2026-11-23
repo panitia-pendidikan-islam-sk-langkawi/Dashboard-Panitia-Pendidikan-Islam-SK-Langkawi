@@ -109,6 +109,13 @@ body{margin:0;background:#eef0fa;padding:12px}
 .pp-lock{border-radius:999px}
 @container (max-width:860px){.pp-wrap{grid-template-columns:1fr}.pp-side{position:static;flex-direction:row;overflow-x:auto;padding:8px;border-radius:14px}.pp-logo,.pp-foot{display:none}.pp-split{grid-template-columns:1fr}.pp-art{opacity:.35}.pp-hero{padding:18px}}
 [data-sec]+[data-sec]{margin-top:18px}
+.pp-alert{border-radius:16px;padding:14px 16px;margin-bottom:14px;color:#fff;background:linear-gradient(120deg,#ff6d00,#f50057 60%,#aa00ff);box-shadow:0 4px 14px rgba(245,0,87,.25)}
+.pp-alert h3{margin:0 0 6px;font-size:15px}
+.pp-alert ul{margin:6px 0;padding-left:18px;font-size:13px}
+.pp-alert li{margin:3px 0}
+.pp-alert .todo{background:rgba(255,255,255,.18);border-radius:10px;padding:8px 10px;font-size:13px;margin-top:8px}
+.pp-alert .todo div{margin:2px 0}
+.pp-alert .late{opacity:.95;font-size:12px;margin-top:6px}
 @media print{.pp [data-sec][hidden]{display:block!important}.pp-side,.pp-top,.pp-ed,.pp-bar{display:none!important}.pp-wrap{display:block}.pp [data-sec]+[data-sec]{break-before:page}}
 </style>
 </head>
@@ -134,6 +141,7 @@ body{margin:0;background:#eef0fa;padding:12px}
 <button class='pp-btn pp-lock' type='button' id='tukar' hidden>Tukar kod</button>
 <button class='pp-btn pri' type='button' id='add-programs'>+ Program baharu</button>
 </header>
+<div class='pp-alert' data-draw='peringatan' hidden></div>
 
 <section id='t-utama' data-sec>
 <div class='pp-hero'>
@@ -829,6 +837,27 @@ dash.draw('overall',el=>{
  el.append(big,bar,stack,lg);
 });
 
+
+const startOf=r=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(r.tarikh||''));if(m)return new Date(+m[1],+m[2]-1,+m[3]);return new Date(2027,range(r)[0]-1,1);};
+dash.draw('peringatan',el=>{
+ const d=dash.data('programs');el.replaceChildren();
+ if(d.status!=='ok'){el.hidden=true;return;}
+ const t0=new Date();t0.setHours(0,0,0,0);
+ const day=r=>Math.round((startOf(r)-t0)/864e5);
+ const act=d.data.filter(r=>r.status!=='Selesai');
+ const soon=act.filter(r=>{const n=day(r);return n>=0&&n<=21;}).sort((a,b)=>day(a)-day(b));
+ const late=act.filter(r=>day(r)<0&&r.status==='Belum mula').sort((a,b)=>day(a)-day(b));
+ if(!soon.length){el.hidden=true;return;}
+ el.hidden=false;
+ const h=document.createElement('h3');h.textContent='🔔 Peringatan: '+soon.length+' program akan bermula dalam 3 minggu';
+ const ul=document.createElement('ul');
+ soon.slice(0,8).forEach(r=>{const n=day(r);const li=document.createElement('li');li.textContent=r.nama+' · '+(r.tarikh?fmtDate(r.tarikh):'bulan '+spanTxt(r))+' ('+(n===0?'hari ini':n+' hari lagi')+')'+(r.pic?' · Penyelaras: '+r.pic:'');ul.append(li);});
+ if(soon.length>8){const li=document.createElement('li');li.textContent='dan '+(soon.length-8)+' program lagi';ul.append(li);}
+ const todo=document.createElement('div');todo.className='todo';
+ ['📄 Hantar kertas kerja (2 minggu sebelum program, dengan sekurang-kurangnya 3 sebut harga).','🗣️ Laksanakan perbincangan dalaman panitia untuk merangka perjalanan program.'].forEach(x=>{const e=document.createElement('div');e.textContent=x;todo.append(e);});
+ el.append(h,ul,todo);
+ if(late.length){const l=document.createElement('div');l.className='late';l.textContent='Belum mula walaupun tarikh sudah lepas: '+late.slice(0,4).map(r=>r.nama).join(', ')+(late.length>4?' dan '+(late.length-4)+' lagi':'')+'.';el.append(l);}
+});
 const tabs=Array.from(document.querySelectorAll('.pp-nav'));
 const secs=Array.from(document.querySelectorAll('[data-sec]'));
 let curTab='utama';
