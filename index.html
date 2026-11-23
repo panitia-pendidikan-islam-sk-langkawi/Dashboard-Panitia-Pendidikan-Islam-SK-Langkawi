@@ -116,6 +116,8 @@ body{margin:0;background:#eef0fa;padding:12px}
 .pp-alert .todo{background:rgba(255,255,255,.18);border-radius:10px;padding:8px 10px;font-size:13px;margin-top:8px}
 .pp-alert .todo div{margin:2px 0}
 .pp-alert .late{opacity:.95;font-size:12px;margin-top:6px}
+.pp-alert .demo{font-size:11px;opacity:.9;margin-top:8px;font-style:italic}
+#demo-alert.on{background:#f50057;color:#fff;border-color:#f50057}
 @media print{.pp [data-sec][hidden]{display:block!important}.pp-side,.pp-top,.pp-ed,.pp-bar{display:none!important}.pp-wrap{display:block}.pp [data-sec]+[data-sec]{break-before:page}}
 </style>
 </head>
@@ -139,6 +141,7 @@ body{margin:0;background:#eef0fa;padding:12px}
 <button class='pp-btn pp-lock' type='button' id='penuh'>📄 Paparan penuh</button>
 <button class='pp-btn pp-lock' type='button' id='kunci'>🔒 Kod edit</button>
 <button class='pp-btn pp-lock' type='button' id='tukar' hidden>Tukar kod</button>
+<button class='pp-btn' type='button' id='demo-alert'>🔔 Demo peringatan</button>
 <button class='pp-btn pri' type='button' id='add-programs'>+ Program baharu</button>
 </header>
 <div class='pp-alert' data-draw='peringatan' hidden></div>
@@ -273,6 +276,20 @@ body{margin:0;background:#eef0fa;padding:12px}
 
 <section id='t-guru' data-sec hidden>
 <div class='pp-card'>
+<h2>RPT Pendidikan Islam 2027</h2>
+<p class='pp-note'>Tahun 1 hingga 6. Untuk muat turun Word atau PDF dengan nama guru dan sekolah sendiri, guna laman web RPT.</p>
+<div class='pp-bar'><a class='pp-btn pri' style='text-decoration:none' target='_blank' rel='noopener' href='https://norazhanahrabion-cmd.github.io/rpt-pendidikan-islam-2027/'>Buka laman web RPT →</a></div>
+<div style='display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px'>
+<div style='border:2px dashed #b0b0c8;border-radius:14px;padding:16px;text-align:center'><b style='font-size:18px'>Tahun 1</b><p class='pp-note' style='margin:8px 0 0'>Belum tersedia. Akan dimuat naik kemudian.</p></div>
+<div style='border-radius:14px;padding:16px;background:linear-gradient(135deg,#2f1fa8,#0061ff 55%,#d500a8);color:#fff'><b style='font-size:18px'>Tahun 2</b><div style='display:flex;gap:8px;margin-top:12px;flex-wrap:wrap'><a class='pp-btn' style='text-decoration:none' target='_blank' rel='noopener' href='https://norazhanahrabion-cmd.github.io/rpt-pendidikan-islam-2027/A2.pdf'>RPT A (PDF)</a><a class='pp-btn' style='text-decoration:none' target='_blank' rel='noopener' href='https://norazhanahrabion-cmd.github.io/rpt-pendidikan-islam-2027/B2.pdf'>RPT B (PDF)</a></div></div>
+<div style='border-radius:14px;padding:16px;background:linear-gradient(135deg,#2f1fa8,#0061ff 55%,#d500a8);color:#fff'><b style='font-size:18px'>Tahun 3</b><div style='display:flex;gap:8px;margin-top:12px;flex-wrap:wrap'><a class='pp-btn' style='text-decoration:none' target='_blank' rel='noopener' href='https://norazhanahrabion-cmd.github.io/rpt-pendidikan-islam-2027/A3.pdf'>RPT A (PDF)</a><a class='pp-btn' style='text-decoration:none' target='_blank' rel='noopener' href='https://norazhanahrabion-cmd.github.io/rpt-pendidikan-islam-2027/B3.pdf'>RPT B (PDF)</a></div></div>
+<div style='border-radius:14px;padding:16px;background:linear-gradient(135deg,#2f1fa8,#0061ff 55%,#d500a8);color:#fff'><b style='font-size:18px'>Tahun 4</b><div style='display:flex;gap:8px;margin-top:12px;flex-wrap:wrap'><a class='pp-btn' style='text-decoration:none' target='_blank' rel='noopener' href='https://norazhanahrabion-cmd.github.io/rpt-pendidikan-islam-2027/A4.pdf'>RPT A (PDF)</a><a class='pp-btn' style='text-decoration:none' target='_blank' rel='noopener' href='https://norazhanahrabion-cmd.github.io/rpt-pendidikan-islam-2027/B4.pdf'>RPT B (PDF)</a></div></div>
+<div style='border-radius:14px;padding:16px;background:linear-gradient(135deg,#2f1fa8,#0061ff 55%,#d500a8);color:#fff'><b style='font-size:18px'>Tahun 5</b><div style='display:flex;gap:8px;margin-top:12px;flex-wrap:wrap'><a class='pp-btn' style='text-decoration:none' target='_blank' rel='noopener' href='https://norazhanahrabion-cmd.github.io/rpt-pendidikan-islam-2027/A5.pdf'>RPT A (PDF)</a><a class='pp-btn' style='text-decoration:none' target='_blank' rel='noopener' href='https://norazhanahrabion-cmd.github.io/rpt-pendidikan-islam-2027/B5.pdf'>RPT B (PDF)</a></div></div>
+<div style='border-radius:14px;padding:16px;background:linear-gradient(135deg,#2f1fa8,#0061ff 55%,#d500a8);color:#fff'><b style='font-size:18px'>Tahun 6</b><div style='display:flex;gap:8px;margin-top:12px;flex-wrap:wrap'><a class='pp-btn' style='text-decoration:none' target='_blank' rel='noopener' href='https://norazhanahrabion-cmd.github.io/rpt-pendidikan-islam-2027/A6.pdf'>RPT A (PDF)</a><a class='pp-btn' style='text-decoration:none' target='_blank' rel='noopener' href='https://norazhanahrabion-cmd.github.io/rpt-pendidikan-islam-2027/B6.pdf'>RPT B (PDF)</a></div></div>
+</div>
+</div>
+<div hidden>
+<div class='pp-card'>
 <h2>RPT 2027: seorang guru bagi setiap tahun</h2>
 <p class='pp-note'>Setiap guru bertanggungjawab ke atas RPT satu tahun. Isi jumlah unit RPT dan bilangan yang telah dilaksanakan; klik satu baris untuk mengemas kini.</p>
 <div class='pp-bar'><button class='pp-btn pri' type='button' id='add-rpt'>+ Tambah tahun</button></div>
@@ -306,6 +323,7 @@ body{margin:0;background:#eef0fa;padding:12px}
 <div class='pp-row'><button type='submit' class='pp-btn pri'>Simpan</button><button type='button' class='pp-btn' data-act='close'>Tutup</button><button type='button' class='pp-btn bad' data-act='del' hidden>Padam</button><button type='button' class='pp-btn bad' data-act='del2' hidden>Sahkan padam</button></div>
 <p class='pp-msg' hidden>Tidak disimpan. Kod edit salah atau tiada sambungan.</p>
 </form>
+</div>
 </div>
 </section>
 
@@ -842,7 +860,8 @@ const startOf=r=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(r.tarikh||''))
 dash.draw('peringatan',el=>{
  const d=dash.data('programs');el.replaceChildren();
  if(d.status!=='ok'){el.hidden=true;return;}
- const t0=new Date();t0.setHours(0,0,0,0);
+ const demo=!!dash.params().demo;
+ const t0=demo?new Date(2027,0,11):new Date();t0.setHours(0,0,0,0);
  const day=r=>Math.round((startOf(r)-t0)/864e5);
  const act=d.data.filter(r=>r.status!=='Selesai');
  const soon=act.filter(r=>{const n=day(r);return n>=0&&n<=21;}).sort((a,b)=>day(a)-day(b));
@@ -856,8 +875,11 @@ dash.draw('peringatan',el=>{
  const todo=document.createElement('div');todo.className='todo';
  ['📄 Hantar kertas kerja (2 minggu sebelum program, dengan sekurang-kurangnya 3 sebut harga).','🗣️ Laksanakan perbincangan dalaman panitia untuk merangka perjalanan program.'].forEach(x=>{const e=document.createElement('div');e.textContent=x;todo.append(e);});
  el.append(h,ul,todo);
+ if(demo){const e=document.createElement('div');e.className='demo';e.textContent='Ini paparan demo, seolah-olah hari ini 11 Januari 2027. Tekan Demo peringatan sekali lagi untuk tutup.';el.append(e);}
  if(late.length){const l=document.createElement('div');l.className='late';l.textContent='Belum mula walaupun tarikh sudah lepas: '+late.slice(0,4).map(r=>r.nama).join(', ')+(late.length>4?' dan '+(late.length-4)+' lagi':'')+'.';el.append(l);}
 });
+const dbtn=document.getElementById('demo-alert');
+if(dbtn)dbtn.addEventListener('click',()=>{const on=!dash.params().demo;dbtn.classList.toggle('on',on);dash.setParams({demo:on?'1':null});});
 const tabs=Array.from(document.querySelectorAll('.pp-nav'));
 const secs=Array.from(document.querySelectorAll('[data-sec]'));
 let curTab='utama';
