@@ -287,14 +287,13 @@ body{margin:0;background:#eef0fa;padding:12px}
 <h2>Guru mengajar 2027</h2>
 <p class='pp-note'>Cadangan guru mengajar PI 2027 daripada minit ketiga (bahagian 5.8).</p>
 <div class='pp-bar'><button class='pp-btn pri' type='button' id='add-guru'>+ Tambah kelas</button></div>
-<div class='pp-scroll'><table class='pp-table'><thead><tr><th>Kelas 2027</th><th>Guru mengajar PI</th><th>Catatan</th></tr></thead><tbody data-draw='tb_guru'></tbody></table></div>
+<div class='pp-scroll'><table class='pp-table'><thead><tr><th>Kelas 2027</th><th>Guru mengajar PI</th></tr></thead><tbody data-draw='tb_guru'></tbody></table></div>
 <form class='pp-ed' id='ed-guru' hidden>
 <h3>Butiran kelas</h3>
 <div class='g'>
 <label>No.<input name='no' type='number' min='0'></label>
 <label>Kelas 2027<input name='kelas' required></label>
 <label>Guru mengajar PI<input name='guru'></label>
-<label>Catatan<input name='catatan'></label>
 </div>
 <div class='pp-row'><button type='submit' class='pp-btn pri'>Simpan</button><button type='button' class='pp-btn' data-act='close'>Tutup</button><button type='button' class='pp-btn bad' data-act='del' hidden>Padam</button><button type='button' class='pp-btn bad' data-act='del2' hidden>Sahkan padam</button></div>
 <p class='pp-msg' hidden>Tidak disimpan. Kod edit salah atau tiada sambungan.</p>
@@ -553,7 +552,7 @@ const F=(names,numeric)=>names.map(n=>({n:n,t:numeric.indexOf(n)>=0?'n':'s'}));
 ED.programs=editor({form:'ed-programs',src:'programs',path:'data/team/programs',fields:F(['nama','kategori','tarikh','mula','tamat','pic','status','peratus','catatan'],['mula','tamat','peratus']),defaults:{kategori:'Peningkatan murid',mula:1,tamat:1,status:'Belum mula',peratus:0},fix:r=>{if(r.tarikh&&/^\d{4}-\d{2}/.test(r.tarikh)){const mm=+r.tarikh.slice(5,7);r.mula=mm;r.tamat=Math.max(mm,r.tamat||mm);}r.mula=Math.min(12,Math.max(1,r.mula||1));r.tamat=Math.min(12,Math.max(r.mula,r.tamat||r.mula));r.peratus=Math.min(100,Math.max(0,r.peratus||0));},done:f=>{f.status.value='Selesai';f.peratus.value=100;}});
 ED.pet=editor({form:'ed-pet',src:'petunjuk',path:'data/team/petunjuk',fields:F(['no','nama','unit','arah','asas','semasa','sasaran','catatan'],['no','asas','semasa','sasaran']),defaults:{unit:'%',arah:'tinggi'}});
 ED.intv=editor({form:'ed-intv',src:'intervensi',path:'data/team/intervensi',fields:F(['isu','intervensi','sasaran','guru','tempoh','status'],[]),defaults:{status:'Belum mula'}});
-ED.guru=editor({form:'ed-guru',src:'guru',path:'data/team/guru',fields:F(['no','kelas','guru','catatan'],['no'])});
+ED.guru=editor({form:'ed-guru',src:'guru',path:'data/team/guru',fields:F(['no','kelas','guru'],['no'])});
 ED.rpt=editor({form:'ed-rpt',src:'rpt',path:'data/team/rpt',fields:F(['tahun','guru','jumlah','dilaksana','tindakan','catatan'],['tahun','jumlah','dilaksana']),defaults:{tahun:1}});
 ED.kew=editor({form:'ed-kew',src:'kewangan',path:'data/team/kewangan',fields:F(['tahun','nama','terima','belanja','catatan'],['tahun','terima','belanja']),defaults:{tahun:2027,terima:0,belanja:0},fix:r=>{r.tahun=Math.round(r.tahun||2027);r.terima=r.terima||0;r.belanja=r.belanja||0;}});
 [['add-pet','pet'],['add-intv','intv'],['add-guru','guru'],['add-rpt','rpt'],['add-kew','kew']].forEach(p=>{const b=document.getElementById(p[0]);if(b&&ED[p[1]])b.addEventListener('click',()=>ED[p[1]].open(null));});
@@ -570,7 +569,7 @@ tableDraw('tb_pbd','pbdCalc',[r=>r.tahun,r=>r.murid,tpc('tp1','#ff1744'),tpc('tp
 tableDraw('tb_uasa','uasaCalc',[r=>r.tahun,r=>r.calon,r=>r.hadir,tpc('a','#00b8d4'),tpc('b','#2979ff'),tpc('c','#ffab00','#222'),tpc('d','#ff6d00'),tpc('e','#f50057'),tpc('th','#78909c'),r=>r.lulus===null?null:cell(r.lulus+'%',r.lulus>=100?'#0057ff':'#ff9100'),r=>r.gpmp===null||r.gpmp===undefined?null:cell(r.gpmp,'#7c4dff')],{empty:'Belum ada data UASA.'});
 tableDraw('tb_intv','intervensi',[r=>r.isu,r=>r.intervensi,r=>r.sasaran,r=>r.guru,r=>r.tempoh,r=>badge(r.status)],{empty:'Belum ada intervensi. Tekan Tambah intervensi.',pick:id=>ED.intv&&ED.intv.open(id)});
 tableDraw('tb_rpt','rptCalc',[r=>'Tahun '+r.tahun,r=>r.guru,r=>r.jumlah,r=>r.dilaksana,r=>r.pct,r=>r.tindakan,r=>r.catatan],{empty:'Belum ada RPT. Tekan Tambah tahun.',pick:id=>ED.rpt&&ED.rpt.open(id)});
-tableDraw('tb_guru','guru',[r=>r.kelas,r=>r.guru,r=>r.catatan],{empty:'Belum ada kelas. Tekan Tambah kelas.',pick:id=>ED.guru&&ED.guru.open(id),filter:l=>l.slice().sort((a,b)=>(a.no==null?9999:num(a.no))-(b.no==null?9999:num(b.no)))});
+tableDraw('tb_guru','guru',[r=>r.kelas,r=>r.guru],{empty:'Belum ada kelas. Tekan Tambah kelas.',pick:id=>ED.guru&&ED.guru.open(id),filter:l=>l.slice().sort((a,b)=>(a.no==null?9999:num(a.no))-(b.no==null?9999:num(b.no)))});
 tableDraw('tb_kew','kewCalc',[r=>r.tahun,r=>r.nama,r=>r.terima,r=>r.belanja,r=>r.baki,r=>r.pct,r=>r.catatan],{empty:'Belum ada peruntukan. Tekan Tambah peruntukan.',pick:id=>ED.kew&&ED.kew.open(id)});
 
 dash.draw('cards',el=>{
