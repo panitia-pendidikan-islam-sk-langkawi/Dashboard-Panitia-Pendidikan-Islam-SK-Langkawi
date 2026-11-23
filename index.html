@@ -116,8 +116,6 @@ body{margin:0;background:#eef0fa;padding:12px}
 .pp-alert .todo{background:rgba(255,255,255,.18);border-radius:10px;padding:8px 10px;font-size:13px;margin-top:8px}
 .pp-alert .todo div{margin:2px 0}
 .pp-alert .late{opacity:.95;font-size:12px;margin-top:6px}
-.pp-alert .demo{font-size:11px;opacity:.9;margin-top:8px;font-style:italic}
-#demo-alert.on{background:#f50057;color:#fff;border-color:#f50057}
 @media print{.pp [data-sec][hidden]{display:block!important}.pp-side,.pp-top,.pp-ed,.pp-bar{display:none!important}.pp-wrap{display:block}.pp [data-sec]+[data-sec]{break-before:page}}
 </style>
 </head>
@@ -141,7 +139,6 @@ body{margin:0;background:#eef0fa;padding:12px}
 <button class='pp-btn pp-lock' type='button' id='penuh'>📄 Paparan penuh</button>
 <button class='pp-btn pp-lock' type='button' id='kunci'>🔒 Kod edit</button>
 <button class='pp-btn pp-lock' type='button' id='tukar' hidden>Tukar kod</button>
-<button class='pp-btn' type='button' id='demo-alert' title='Lihat contoh peringatan' aria-label='Lihat contoh peringatan'>🔔</button>
 <button class='pp-btn pri' type='button' id='add-programs'>+ Program baharu</button>
 </header>
 <div class='pp-alert' data-draw='peringatan' hidden></div>
@@ -860,8 +857,7 @@ const startOf=r=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(r.tarikh||''))
 dash.draw('peringatan',el=>{
  const d=dash.data('programs');el.replaceChildren();
  if(d.status!=='ok'){el.hidden=true;return;}
- const demo=!!dash.params().demo;
- const t0=demo?new Date(2027,0,11):new Date();t0.setHours(0,0,0,0);
+ const t0=new Date();t0.setHours(0,0,0,0);
  const day=r=>Math.round((startOf(r)-t0)/864e5);
  const act=d.data.filter(r=>r.status!=='Selesai');
  const soon=act.filter(r=>{const n=day(r);return n>=0&&n<=21;}).sort((a,b)=>day(a)-day(b));
@@ -875,11 +871,8 @@ dash.draw('peringatan',el=>{
  const todo=document.createElement('div');todo.className='todo';
  ['📄 Hantar kertas kerja (2 minggu sebelum program, dengan sekurang-kurangnya 3 sebut harga).','🗣️ Laksanakan perbincangan dalaman panitia untuk merangka perjalanan program.'].forEach(x=>{const e=document.createElement('div');e.textContent=x;todo.append(e);});
  el.append(h,ul,todo);
- if(demo){const e=document.createElement('div');e.className='demo';e.textContent='Ini paparan demo, seolah-olah hari ini 11 Januari 2027. Tekan Demo peringatan sekali lagi untuk tutup.';el.append(e);}
  if(late.length){const l=document.createElement('div');l.className='late';l.textContent='Belum mula walaupun tarikh sudah lepas: '+late.slice(0,4).map(r=>r.nama).join(', ')+(late.length>4?' dan '+(late.length-4)+' lagi':'')+'.';el.append(l);}
 });
-const dbtn=document.getElementById('demo-alert');
-if(dbtn)dbtn.addEventListener('click',()=>{const on=!dash.params().demo;dbtn.classList.toggle('on',on);dash.setParams({demo:on?'1':null});});
 const tabs=Array.from(document.querySelectorAll('.pp-nav'));
 const secs=Array.from(document.querySelectorAll('[data-sec]'));
 let curTab='utama';
