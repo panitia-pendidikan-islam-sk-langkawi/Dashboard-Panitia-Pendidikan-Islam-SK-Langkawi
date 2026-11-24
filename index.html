@@ -24,6 +24,21 @@ body{margin:0;background:#eef0fa;padding:12px}
 .pp-nav.on{background:linear-gradient(90deg,#ff4fd8,#ff7a59);color:#fff;font-weight:600}
 .pp-nav i{font-style:normal;width:20px;flex:none;text-align:center}
 .pp-disc{margin:22px 0 6px;padding:12px 16px;border-radius:14px;background:#fff3e0;border:1px solid #ffb74d;color:#5d3a00;font-size:13px;line-height:1.5;text-align:center}
+.pp-fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.pp-ft{border-radius:14px;overflow:hidden;border:1px solid var(--color-border-line);background:var(--color-bg);display:flex;flex-direction:column}
+.pp-ft h3{margin:0;padding:10px 14px;color:#fff;font-size:15px;font-weight:600}
+.pp-ft ul{list-style:none;margin:0;padding:10px 14px;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.pp-ft a{color:#0057ff;word-break:break-word}
+.pp-ft .kosong{opacity:.65;font-style:italic;font-size:13px;padding:10px 14px}
+.pp.locked .pp-nav[data-tab=kewangan]::after{content:'🔒';margin-left:auto;font-size:12px}
+.pp-ft.terhad h3::after{content:' 🔒'}
+.pp-ft.terhad{cursor:pointer}
+.pp-modal{position:fixed;inset:0;background:rgba(20,10,60,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.pp-modal[hidden]{display:none}
+.pp-modal>div{background:#fff;color:#1a1a2e;border-radius:18px;max-width:420px;width:100%;padding:22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.pp-modal .ic{font-size:40px}
+.pp-modal p{margin:10px 0 16px;line-height:1.5}
+.pp-modal .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .pp-foot{margin-top:auto;padding:14px 8px 4px;font-size:11px;opacity:.7;line-height:1.5}
 .pp-main{min-width:0}
 .pp-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
@@ -130,6 +145,9 @@ body{margin:0;background:#eef0fa;padding:12px}
 <button class='pp-nav' type='button' role='tab' data-tab='intervensi'><i>🎯</i>Intervensi</button>
 <button class='pp-nav' type='button' role='tab' data-tab='guru'><i>👩‍🏫</i>RPT Pendidikan Islam 2027</button>
 <button class='pp-nav' type='button' role='tab' data-tab='kewangan'><i>💰</i>Kewangan</button>
+<button class='pp-nav' type='button' role='tab' data-tab='opr'><i>📝</i>OPR Program</button>
+<button class='pp-nav' type='button' role='tab' data-tab='nadi'><i>📈</i>Analisa Bulanan NADI</button>
+<button class='pp-nav' type='button' role='tab' data-tab='fail'><i>🗂️</i>Pengurusan Fail Panitia</button>
 <div class='pp-foot'>Bersama membina generasi Qurani.<br>Data asas: minit mesyuarat panitia 2026.</div>
 </aside>
 <main class='pp-main'>
@@ -346,6 +364,28 @@ body{margin:0;background:#eef0fa;padding:12px}
 </form>
 </div>
 </section>
+<section id='t-opr' data-sec hidden>
+<div class='pp-card'>
+<h2>OPR Program</h2>
+<p class='pp-note'>Laporan satu muka surat (One Page Report) bagi setiap program panitia 2027. Bahan akan dimuat naik kemudian.</p>
+<div class='pp-fgrid' id='g-opr'></div>
+</div>
+</section>
+<section id='t-nadi' data-sec hidden>
+<div class='pp-card'>
+<h2>Analisa Bulanan NADI</h2>
+<p class='pp-note'>Analisa prestasi bulanan NADI bagi Januari hingga Disember 2027. Bahan akan dimuat naik kemudian.</p>
+<div class='pp-fgrid' id='g-nadi'></div>
+</div>
+</section>
+<section id='t-fail' data-sec hidden>
+<div class='pp-card'>
+<h2>Pengurusan Fail Panitia</h2>
+<p class='pp-note'>Simpanan dokumen rasmi panitia mengikut kategori. Bahan akan dimuat naik kemudian.</p>
+<div class='pp-fgrid' id='g-fail' data-draw='failgrid'></div>
+</div>
+</section>
+<div class='pp-modal' id='terhad' hidden role='dialog' aria-modal='true'><div><div class='ic'>🔒</div><p><b>Bahagian ini hanya untuk makluman dan pantauan guru Pendidikan Islam dan pentadbir SK Langkawi sahaja.</b></p><div class='row'><button type='button' class='pp-btn pri' id='terhad-kod'>Saya ada kod</button><button type='button' class='pp-btn' id='terhad-tutup'>Tutup</button></div></div></div>
 <footer class='pp-disc' role='note'><b>Penafian:</b> Web ini masih di fasa percubaan. Sebarang maklumat akan dikemaskini dari semasa ke semasa. Sila rujuk KP atau admin web jika anda mempunyai sebarang pertanyaan.</footer>
 </main></div></div>
 
@@ -354,7 +394,8 @@ body{margin:0;background:#eef0fa;padding:12px}
 const SB_URL='https://pqydwortuesdwaklnyeg.supabase.co';
 const SB_KEY='sb_publishable_Imcgl-NSl6JjvvGlW2bzjA_K2m4HpaC';
 const sb=supabase.createClient(SB_URL,SB_KEY);
-const COLLS=['programs','pbd','uasa','petunjuk','kewangan','guru','quran','jawi','solat','intervensi','rpt'];
+const COLLS=['programs','pbd','uasa','petunjuk','kewangan','guru','quran','jawi','solat','intervensi','rpt','minit'];
+const PROT=['kewangan','minit'];
 const store={};COLLS.forEach(c=>store[c]=null);
 const calcs={},draws={},params={};
 let loadErr=false,raf=0;
@@ -386,9 +427,17 @@ const setSambung=(t,ok)=>{const e=document.getElementById('sambung');if(e){e.tex
 async function loadAll(){
  const {data,error}=await sb.from('pp_rows').select('coll,id,data').limit(5000);
  if(error){loadErr=true;setSambung('Gagal sambung',false);renderAll();return;}
- loadErr=false;COLLS.forEach(c=>store[c]=[]);
- data.forEach(r=>{if(store[r.coll])store[r.coll].push(Object.assign({id:r.id},r.data));});
+ loadErr=false;COLLS.forEach(c=>{if(!PROT.includes(c))store[c]=[];});
+ data.forEach(r=>{if(store[r.coll]&&!PROT.includes(r.coll))store[r.coll].push(Object.assign({id:r.id},r.data));});
+ await loadProt();
  setSambung('Tersambung · disimpan',true);renderAll();
+}
+async function loadProt(){
+ PROT.forEach(c=>store[c]=[]);
+ const kod=getCode();if(!kod)return;
+ const {data,error}=await sb.rpc('pp_baca',{kod:kod});
+ if(error){if(/kod salah/.test(error.message)){try{localStorage.removeItem(KEY);}catch(e){}updLock();}return;}
+ (data||[]).forEach(r=>{if(store[r.coll])store[r.coll].push(Object.assign({id:r.id},r.data));});
 }
 sb.channel('pp-live').on('postgres_changes',{event:'*',schema:'public',table:'pp_rows'},p=>{
  if(p.eventType==='DELETE'){const o=p.old||{};if(o.coll&&o.id)applyRow(o.coll,o.id,null,true);}
@@ -400,8 +449,8 @@ setInterval(()=>{if(document.visibilityState==='visible')loadAll();},60000);
 /* ===== Kod edit bersama ===== */
 const KEY='pp_kod_edit';
 const getCode=()=>{try{return localStorage.getItem(KEY)||'';}catch(e){return '';}};
-const setCode=v=>{try{if(v)localStorage.setItem(KEY,v);else localStorage.removeItem(KEY);}catch(e){}updLock();};
-function updLock(){const on=!!getCode();const k=document.getElementById('kunci'),t=document.getElementById('tukar');if(k)k.textContent=on?'🔓 Mod edit aktif':'🔒 Kod edit';if(t)t.hidden=!on;}
+const setCode=v=>{try{if(v)localStorage.setItem(KEY,v);else localStorage.removeItem(KEY);}catch(e){}updLock();if(typeof loadAll==='function')loadAll().then(()=>{if(!getCode()&&typeof curTab!=='undefined'&&curTab==='kewangan')show('utama');});};
+function updLock(){const on=!!getCode();const pp=document.querySelector('.pp');if(pp)pp.classList.toggle('locked',!on);const k=document.getElementById('kunci'),t=document.getElementById('tukar');if(k)k.textContent=on?'🔓 Mod edit aktif':'🔒 Kod edit';if(t)t.hidden=!on;}
 async function askCode(){
  const c=window.prompt('Masukkan kod edit panitia:');if(!c)return false;
  const {data,error}=await sb.rpc('pp_semak',{kod:c});
@@ -884,13 +933,66 @@ dash.draw('lonceng',el=>{
 });
 const lbtn=document.getElementById('loceng');
 if(lbtn)lbtn.addEventListener('click',()=>{const a=document.querySelector('[data-draw=peringatan]');if(a&&!a.hidden){a.scrollIntoView({behavior:'smooth',block:'center'});}else{alert('Tiada program yang akan bermula dalam 3 minggu.');}});
+/* Pautan bahan: tambah {t:'Tajuk',u:'https://...'} dalam senarai yang berkaitan. */
+const PAUTAN={
+ opr:{},
+ nadi:{},
+ fail:{}
+};
+(function(){
+ const GRAD=['#2f1fa8,#0061ff','#0061ff,#00b8d4','#d500a8,#ff4fd8','#ff7a59,#ff1744','#5b3ff0,#d500a8','#e65100,#ffab40','#0057ff,#5b3ff0','#c2185b,#ff4081','#00838f,#0057ff'];
+ const OPR=['Program Kecemerlangan Akademik','Program Bimbingan Al-Quran','Program Jawi dan Solat','Sambutan Hari Kebesaran Islam','Program Pembangunan Guru (PLC)','Lain-lain program'];
+ const BLN=['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+ const FAIL=['Minit Mesyuarat','Kertas Kerja Program','Laporan Program','Surat Rasmi','RPT dan RPH','Instrumen dan Borang','Data Murid dan Prestasi','Gambar dan Dokumentasi','Lain-lain'];
+ const build=(id,key,names)=>{
+  const g=document.getElementById(id);if(!g)return;g.replaceChildren();
+  names.forEach((n,i)=>{
+   const t=document.createElement('div');t.className='pp-ft';
+   const h=document.createElement('h3');h.textContent=n;h.style.background='linear-gradient(120deg,'+GRAD[i%GRAD.length]+')';t.append(h);
+   const l=(PAUTAN[key]||{})[n]||[];
+   if(!l.length){const k=document.createElement('div');k.className='kosong';k.textContent='Belum dimuat naik';t.append(k);}
+   else{const ul=document.createElement('ul');l.forEach(x=>{const li=document.createElement('li');const a=document.createElement('a');a.href=x.u;a.target='_blank';a.rel='noopener';a.textContent=x.t;li.append(a);ul.append(li);});t.append(ul);}
+   g.append(t);
+  });
+ };
+ build('g-opr','opr',OPR);build('g-nadi','nadi',BLN);
+ dash.draw('failgrid',g=>{
+  g.replaceChildren();
+  const m=dash.data('minit');const minit=(m.status==='ok'?m.data:[]).slice().sort((a,b)=>String(a.t).localeCompare(String(b.t)));
+  FAIL.forEach((n,i)=>{
+   const t=document.createElement('div');t.className='pp-ft';
+   const h=document.createElement('h3');h.textContent=n;h.style.background='linear-gradient(120deg,'+GRAD[i%GRAD.length]+')';t.append(h);
+   let l=(PAUTAN.fail||{})[n]||[];
+   if(n==='Minit Mesyuarat'){
+    if(!getCode()){t.classList.add('terhad');const k=document.createElement('div');k.className='kosong';k.textContent='Terhad. Tekan untuk maklumat.';t.append(k);t.addEventListener('click',()=>notifTerhad(()=>renderAll()));g.append(t);return;}
+    l=minit.map(r=>({t:r.t,u:r.u}));
+   }
+   if(!l.length){const k=document.createElement('div');k.className='kosong';k.textContent='Belum dimuat naik';t.append(k);}
+   else{const ul=document.createElement('ul');l.forEach(x=>{const li=document.createElement('li');const a=document.createElement('a');a.href=x.u;a.target='_blank';a.rel='noopener';a.textContent=x.t;li.append(a);ul.append(li);});t.append(ul);}
+   g.append(t);
+  });
+ });
+})();
 const tabs=Array.from(document.querySelectorAll('.pp-nav'));
 const secs=Array.from(document.querySelectorAll('[data-sec]'));
 let curTab='utama';
 let full=false;
+let pendingTab=null;
+function notifTerhad(then){pendingTab=then||null;const m=document.getElementById('terhad');if(m)m.hidden=false;}
+(function(){
+ const m=document.getElementById('terhad');if(!m)return;
+ const close=()=>{m.hidden=true;pendingTab=null;};
+ document.getElementById('terhad-tutup').addEventListener('click',close);
+ m.addEventListener('click',e=>{if(e.target===m)close();});
+ document.getElementById('terhad-kod').addEventListener('click',async()=>{
+  const go=pendingTab;m.hidden=true;
+  if(await askCode()){await loadAll();if(go)go();}
+ });
+})();
 function show(name){
+ if(name==='kewangan'&&!getCode()){notifTerhad(()=>show('kewangan'));return;}
  curTab=name;
- secs.forEach(s=>{s.hidden=full?false:s.id!=='t-'+name;});
+ secs.forEach(s=>{s.hidden=full?(s.id==='t-kewangan'&&!getCode()):s.id!=='t-'+name;});
  tabs.forEach(b=>{const on=b.getAttribute('data-tab')===name;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false');});
  dash.setLink(name);renderAll();
  if(full){const el=document.getElementById('t-'+name);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
