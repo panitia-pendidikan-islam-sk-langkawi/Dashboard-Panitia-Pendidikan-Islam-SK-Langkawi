@@ -433,11 +433,13 @@ async function loadAll(){
  setSambung('Tersambung · disimpan',true);renderAll();
 }
 async function loadProt(){
- PROT.forEach(c=>store[c]=[]);
- const kod=getCode();if(!kod)return;
+ const kod=getCode();
+ if(!kod){PROT.forEach(c=>store[c]=[]);return;}
  const {data,error}=await sb.rpc('pp_baca',{kod:kod});
- if(error){if(/kod salah/.test(error.message)){try{localStorage.removeItem(KEY);}catch(e){}updLock();}return;}
- (data||[]).forEach(r=>{if(store[r.coll])store[r.coll].push(Object.assign({id:r.id},r.data));});
+ if(error){if(/kod salah/.test(error.message)){PROT.forEach(c=>store[c]=[]);try{localStorage.removeItem(KEY);}catch(e){}updLock();}return;}
+ const tmp={};PROT.forEach(c=>tmp[c]=[]);
+ (data||[]).forEach(r=>{if(tmp[r.coll])tmp[r.coll].push(Object.assign({id:r.id},r.data));});
+ PROT.forEach(c=>store[c]=tmp[c]);
 }
 sb.channel('pp-live').on('postgres_changes',{event:'*',schema:'public',table:'pp_rows'},p=>{
  if(p.eventType==='DELETE'){const o=p.old||{};if(o.coll&&o.id)applyRow(o.coll,o.id,null,true);}
